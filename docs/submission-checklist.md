@@ -9,7 +9,8 @@
 - [x] Apache 2.0 license visible at repository root
 - [x] Third-party notices reviewed
 - [x] Competition branch pushed to the participant fork
-- [ ] Draft pull request, self-review and merge completed
+- [x] Draft pull request opened as official repository PR #1
+- [ ] Pull request self-review and merge completed
 - [ ] Official AI Coding collector verified in the openvela `.repo` workspace
 - [ ] Reviewed competition conversations present under `logs/<github-login>/`
 - [x] Source builds from a clean remote checkout

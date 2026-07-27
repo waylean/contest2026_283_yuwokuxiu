@@ -22,8 +22,8 @@ Current status:
 
 - Organizer repository and collaborator access: complete.
 - Migration branch: `agent/import-bmt-smash-contest`.
-- Fork branch push and clean remote checkout: complete.
-- CLA, official collector, pull request review and merge: pending.
+- Fork branch push, clean remote checkout and draft PR #1: complete.
+- CLA, official collector, pull request self-review and merge: pending.
 
 Acceptance:
 
