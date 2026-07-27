@@ -107,7 +107,25 @@ Do not estimate or invent token usage.
   contest packaging were adapted.
 - Verification: clean dependency install, package audit, production replay,
   JSC-only build and the five-screen emulator lifecycle and cold-relaunch flow
-  passed in the organizer repository.
+  passed in the organizer repository. A second verification cloned the pushed
+  fork branch into a new temporary directory and repeated dependency install,
+  audit, replay and build successfully.
 - Token usage: not exposed by the current development tool; recorded as
   unavailable rather than estimated.
 - Commit: `4244183`.
+
+## 2026-07-27 - Submission narrative preparation
+
+- Objective: convert the verified source tree into a judge-reviewable
+  submission structure without overstating unmeasured accuracy.
+- AI tool: OpenAI Codex.
+- Changes: added a Chinese introduction draft, a timed five-minute Demo script,
+  a final-package map and a traceable evidence checklist; updated readiness and
+  submission status.
+- Human review boundary: claims based on real users or real-device accuracy
+  remain explicitly marked as requiring dated, anonymized evidence.
+- Verification: the materials cover the mandatory openvela capability,
+  technical optimization, AI-Native workflow, product scenario, repository and
+  improvement-suggestion sections. Final PDF/PPTX and Demo remain pending.
+- Token usage: not exposed by the current development tool; recorded as
+  unavailable rather than estimated.

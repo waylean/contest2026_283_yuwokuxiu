@@ -10,10 +10,10 @@ This is an internal readiness estimate, not an official score.
 | --- | --- | --- | --- |
 | Technical difficulty, 30 | Production accelerometer pipeline, recovery and impact filters, deterministic replay, crash recovery | No labeled field dataset, comparative metrics or deep openvela contribution | Medium |
 | Product innovation, 20 | Wrist-only badminton training, history, scoring, optional heart rate, real users | Differentiation is not yet expressed as measurable product outcomes | Strong |
-| Completeness, 20 | JSC build, emulator lifecycle, cold history restore, isolated standalone source | No clean-checkout CI, long real-device report or final delivery package | Medium |
+| Completeness, 20 | Clean remote checkout, JSC build, emulator lifecycle, cold history restore, isolated standalone source | No CI, long real-device report or final delivery package | Medium |
 | AI development, 10 | Reusable Skill, AI log summary, two-agent blind review | Official collector logs are absent; AI contribution lacks measured evidence | Medium-low |
 | Commercial potential, 10 | Existing paid users and public demand | Evidence is not anonymized, summarized or connected to a scalable plan | Strong but undocumented |
-| Presentation, 10 | Emulator screenshots | No five-minute Demo, deck, live-demo fallback or defense script | Low |
+| Presentation, 10 | Emulator screenshots and a timed Demo script | No final Demo, deck or rehearsed defense | Medium-low |
 
 ## Award target
 
