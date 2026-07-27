@@ -1,0 +1,7 @@
+<script>
+  /**
+   * Keep this app-level file present so AIoT-IDE can treat the project as a
+   * Xiaomi Vela JS application. Shared helpers can be exposed here later.
+   */
+  export default {}
+</script>

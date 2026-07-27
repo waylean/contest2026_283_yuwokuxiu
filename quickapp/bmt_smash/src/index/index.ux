@@ -1,0 +1,3472 @@
+<template>
+  <div class="page" onswipe="onPageSwipe" ontouchstart="onPageTouchStart" ontouchend="onPageTouchEnd">
+    <div class="topBar">
+      <text class="appTitle">{{appTitleText}}</text>
+      <text class="timer">{{displayTimeText}}</text>
+    </div>
+
+    <div class="controlScreen" if="{{showControlScreen}}">
+      <div class="controlInfo">
+        <text class="controlTimer">{{elapsedText}}</text>
+        <text class="controlMessage">{{message}}</text>
+      </div>
+      <div class="controlButtons">
+        <div class="controlButtonRow">
+          <div class="controlButton" onclick="startOrResumeSession">
+            <text class="controlButtonText">{{controlPrimaryText}}</text>
+          </div>
+          <div class="controlButton" onclick="pauseSession">
+            <text class="controlButtonText">{{controlPauseText}}</text>
+          </div>
+        </div>
+        <div class="controlButtonRow">
+          <div class="controlButton" onclick="finishSession">
+            <text class="controlButtonText">{{controlEndText}}</text>
+          </div>
+          <div class="controlButton" onclick="exitApp">
+            <text class="controlButtonText">退出</text>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="metricsScreen" if="{{showMetricsScreen}}">
+      <div class="heroMetric">
+        <text class="metricLabel">挥拍强度</text>
+        <text class="heroValue">{{speedKmh}}</text>
+        <text class="waveStatus">{{waveformStatus}}</text>
+        <text class="waveText">{{waveformText}}</text>
+      </div>
+
+      <div class="statsGrid">
+        <div class="statCard">
+          <text class="statLabel">有效挥拍</text>
+          <text class="statValue">{{swingCount}}</text>
+        </div>
+        <div class="statCard">
+          <text class="statLabel">最大强度</text>
+          <text class="statValue">{{bestKmh}}</text>
+        </div>
+      </div>
+
+      <div class="wideMetric">
+        <text class="wideLabel">预测球速</text>
+        <text class="wideValue">{{shuttleKmh}} km/h</text>
+      </div>
+    </div>
+
+    <div class="healthScreen" if="{{showHealthScreen}}">
+      <div class="healthMetricCard">
+        <text class="healthMetricLabel">当前心率</text>
+        <div class="healthMetricValueRow">
+          <text class="healthMetricValue">{{heartRateText}}</text>
+          <text class="healthMetricUnit">bpm</text>
+        </div>
+      </div>
+      <div class="healthMetricCard">
+        <text class="healthMetricLabel">平均心率</text>
+        <div class="healthMetricValueRow">
+          <text class="healthMetricValue">{{averageHeartRate}}</text>
+          <text class="healthMetricUnit">bpm</text>
+        </div>
+      </div>
+      <div class="healthMetricCard">
+        <text class="healthMetricLabel">最高心率</text>
+        <div class="healthMetricValueRow">
+          <text class="healthMetricValue">{{maximumHeartRate}}</text>
+          <text class="healthMetricUnit">bpm</text>
+        </div>
+      </div>
+      <div class="healthMetricCard healthMetricCardLast">
+        <text class="healthMetricLabel">估算热量</text>
+        <div class="healthMetricValueRow">
+          <text class="healthMetricValue healthCalorieValue">{{estimatedCaloriesText}}</text>
+          <text class="healthMetricUnit">kcal</text>
+        </div>
+      </div>
+    </div>
+
+    <div class="settingsScreen" if="{{showSettingsScreen}}">
+      <div class="settingCard">
+        <text class="settingLabel">持拍手</text>
+        <div class="settingButton" onclick="cycleHand">
+          <text class="settingButtonText">{{handText}}</text>
+        </div>
+      </div>
+      <div class="settingCard">
+        <text class="settingLabel">身高</text>
+        <div class="heightControl">
+          <div class="heightStepButton" onclick="decreaseHeight">
+            <text class="heightStepButtonText">-</text>
+          </div>
+          <div class="heightValue" onclick="increaseHeight">
+            <text class="heightValueText">{{heightInputText}}</text>
+          </div>
+          <div class="heightStepButton" onclick="increaseHeight">
+            <text class="heightStepButtonText">+</text>
+          </div>
+        </div>
+      </div>
+      <div class="settingCard">
+        <text class="settingLabel">表带</text>
+        <div class="settingButton" onclick="cycleStrap">
+          <text class="settingButtonText">{{strapText}}</text>
+        </div>
+      </div>
+    </div>
+
+    <div class="historyScreen" if="{{showHistoryScreen}}">
+      <div class="historyHeader">
+        <text class="historyTitle">历史回放</text>
+        <text class="historyHint">{{historyCountText}}</text>
+      </div>
+      <list class="historyList" if="{{historyListVisible}}" bounces="true">
+        <list-item for="{{historyRows}}" class="historyRow" type="historyRow" onclick="openHistoryItem($idx,$item)">
+          <text class="historyRowTitle">{{$item.title}}</text>
+          <text class="historyRowMeta">{{$item.meta}}</text>
+        </list-item>
+      </list>
+      <div class="historyEmpty" if="{{historyEmptyVisible}}">
+        <text class="historyEmptyText">暂无历史</text>
+      </div>
+    </div>
+
+    <div class="historyDetailScreen" if="{{showHistoryDetailScreen}}">
+      <div class="historyDetailHeader">
+        <text class="historyDetailTitle">{{historyDetailTitle}}</text>
+        <text class="historyDetailMeta">{{historyDetailMeta}}</text>
+      </div>
+
+      <div class="heroMetric historyHero">
+        <text class="metricLabel historyHeroLabel">挥拍强度</text>
+        <text class="heroValue historyHeroValue">{{historyDetailSpeed}}</text>
+      </div>
+
+      <div class="statsGrid historyStatsGrid">
+        <div class="statCard historyStatCard">
+          <text class="statLabel historyStatLabel">有效挥拍</text>
+          <text class="statValue historyStatValue">{{historyDetailSwings}}</text>
+        </div>
+        <div class="statCard historyStatCard">
+          <text class="statLabel historyStatLabel">最大强度</text>
+          <text class="statValue historyStatValue">{{historyDetailBest}}</text>
+        </div>
+      </div>
+
+      <div class="wideMetric historyWideMetric">
+        <text class="wideLabel historyWideLabel">平均强度</text>
+        <text class="wideValue historyWideValue">{{historyDetailAverage}}</text>
+      </div>
+
+      <div class="historyDeleteButton" onclick="deleteHistoryItem">
+        <text class="historyDeleteText">{{historyDetailDeleteText}}</text>
+      </div>
+    </div>
+
+    <div class="scoreScreen" if="{{showScoreScreen}}">
+      <div class="scoreHeader">
+        <text class="scoreTitle">计分</text>
+        <text class="scoreHint">{{scoreStatusText}}</text>
+      </div>
+
+      <div class="scorePanel scorePanelHome">
+        <div class="scoreStepButton" onclick="decreaseHomeScore">
+          <text class="scoreStepText">-</text>
+        </div>
+        <div class="scoreMain">
+          <div class="scoreLabelRow">
+            <text class="scoreServeDot" if="{{homeServeVisible}}">●</text>
+            <text class="scoreLabel">我方</text>
+          </div>
+          <text class="scoreValue">{{homeScore}}</text>
+        </div>
+        <div class="scoreStepButton scorePlusButton" onclick="increaseHomeScore">
+          <text class="scoreStepText">+</text>
+        </div>
+      </div>
+
+      <div class="scorePanel scorePanelAway">
+        <div class="scoreStepButton" onclick="decreaseAwayScore">
+          <text class="scoreStepText">-</text>
+        </div>
+        <div class="scoreMain">
+          <div class="scoreLabelRow">
+            <text class="scoreServeDot" if="{{awayServeVisible}}">●</text>
+            <text class="scoreLabel">对方</text>
+          </div>
+          <text class="scoreValue">{{awayScore}}</text>
+        </div>
+        <div class="scoreStepButton scorePlusButton" onclick="increaseAwayScore">
+          <text class="scoreStepText">+</text>
+        </div>
+      </div>
+
+      <div class="scoreResetButton" onclick="resetScore">
+        <text class="scoreResetText">比分清零</text>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+  .page {
+    width: 480px;
+    height: 686px;
+    background-color: #ffffff;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+
+  .topBar {
+    width: 424px;
+    height: 34px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .appTitle {
+    color: #000000;
+    font-size: 26px;
+    font-weight: bold;
+  }
+
+  .timer {
+    color: #000000;
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .controlScreen {
+    width: 424px;
+    height: 602px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 14px;
+  }
+
+  .healthScreen {
+    width: 424px;
+    height: 602px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 14px;
+  }
+
+  .healthMetricCard {
+    width: 424px;
+    height: 137px;
+    background-color: #f1f2f4;
+    border-radius: 8px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 18px;
+  }
+
+  .healthMetricLabel {
+    color: #555555;
+    font-size: 26px;
+    font-weight: bold;
+  }
+
+  .healthMetricValueRow {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: flex-end;
+  }
+
+  .healthMetricValue {
+    color: #000000;
+    font-size: 48px;
+    font-weight: bold;
+  }
+
+  .healthCalorieValue {
+    font-size: 40px;
+  }
+
+  .healthMetricCardLast {
+    margin-bottom: 0px;
+  }
+
+  .healthMetricUnit {
+    color: #555555;
+    font-size: 18px;
+    margin-left: 6px;
+  }
+
+  .controlInfo {
+    width: 424px;
+    height: 316px;
+    background-color: #f2f4f7;
+    border-radius: 8px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .controlTimer {
+    width: 396px;
+    color: #000000;
+    font-size: 94px;
+    font-weight: bold;
+    text-align: center;
+    height: 112px;
+  }
+
+  .controlMessage {
+    width: 392px;
+    height: 42px;
+    color: #333333;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .controlButtons {
+    width: 424px;
+    height: 246px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+
+  .controlButtonRow {
+    width: 424px;
+    height: 116px;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .controlButton {
+    width: 206px;
+    height: 116px;
+    border-radius: 8px;
+    background-color: #000000;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .controlButtonText {
+    width: 190px;
+    color: #ffffff;
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .metricsScreen {
+    width: 424px;
+    height: 602px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 14px;
+  }
+
+  .heroMetric {
+    width: 424px;
+    height: 270px;
+    background-color: #f2f4f7;
+    border-radius: 8px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .metricLabel {
+    color: #555555;
+    font-size: 36px;
+    font-weight: bold;
+  }
+
+  .heroValue {
+    color: #000000;
+    font-size: 100px;
+    font-weight: bold;
+    margin-top: 2px;
+  }
+
+  .waveStatus {
+    width: 388px;
+    color: #666666;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 0px;
+  }
+
+  .waveText {
+    width: 388px;
+    height: 38px;
+    color: #111111;
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .statsGrid {
+    width: 424px;
+    height: 136px;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 18px;
+  }
+
+  .statCard {
+    width: 206px;
+    height: 136px;
+    background-color: #f2f4f7;
+    border-radius: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding-left: 18px;
+  }
+
+  .statLabel {
+    color: #555555;
+    font-size: 30px;
+    font-weight: bold;
+  }
+
+  .statValue {
+    color: #000000;
+    font-size: 58px;
+    font-weight: bold;
+    margin-top: 4px;
+  }
+
+  .wideMetric {
+    width: 424px;
+    height: 136px;
+    background-color: #f2f4f7;
+    border-radius: 8px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 18px;
+    padding-right: 18px;
+    margin-top: 18px;
+  }
+
+  .wideLabel {
+    color: #555555;
+    font-size: 32px;
+    font-weight: bold;
+  }
+
+  .wideValue {
+    color: #000000;
+    font-size: 46px;
+    font-weight: bold;
+  }
+
+  .settingsScreen {
+    width: 424px;
+    height: 602px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 14px;
+  }
+
+  .settingCard {
+    width: 424px;
+    height: 180px;
+    border-radius: 8px;
+    background-color: #f2f4f7;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 22px;
+    padding-right: 18px;
+    margin-bottom: 18px;
+  }
+
+  .settingLabel {
+    color: #333333;
+    font-size: 42px;
+    font-weight: bold;
+  }
+
+  .settingButton {
+    width: 214px;
+    height: 88px;
+    border-radius: 8px;
+    background-color: #000000;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .settingButtonText {
+    width: 214px;
+    color: #ffffff;
+    font-size: 34px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .heightControl {
+    width: 252px;
+    height: 88px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .heightStepButton {
+    width: 58px;
+    height: 88px;
+    border-radius: 8px;
+    background-color: #000000;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .heightStepButtonText {
+    width: 58px;
+    color: #ffffff;
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .heightValue {
+    width: 124px;
+    height: 88px;
+    border-radius: 8px;
+    background-color: #000000;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .heightValueText {
+    width: 124px;
+    color: #ffffff;
+    font-size: 34px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .historyScreen {
+    width: 424px;
+    height: 602px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 14px;
+  }
+
+  .historyHeader {
+    width: 424px;
+    height: 82px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .historyTitle {
+    color: #000000;
+    font-size: 42px;
+    font-weight: bold;
+  }
+
+  .historyHint {
+    color: #555555;
+    font-size: 26px;
+    font-weight: bold;
+  }
+
+  .historyList {
+    width: 424px;
+    height: 502px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .historyRow {
+    width: 424px;
+    height: 150px;
+    border-radius: 8px;
+    background-color: #f2f4f7;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding-left: 22px;
+    padding-right: 18px;
+    margin-bottom: 18px;
+  }
+
+  .historyRowTitle {
+    width: 384px;
+    color: #000000;
+    font-size: 34px;
+    font-weight: bold;
+  }
+
+  .historyRowMeta {
+    width: 384px;
+    color: #555555;
+    font-size: 26px;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+
+  .historyEmpty {
+    width: 424px;
+    height: 502px;
+    border-radius: 8px;
+    background-color: #f2f4f7;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .historyEmptyText {
+    color: #555555;
+    font-size: 36px;
+    font-weight: bold;
+  }
+
+  .historyDetailScreen {
+    width: 424px;
+    height: 602px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 14px;
+  }
+
+  .historyDetailHeader {
+    width: 424px;
+    height: 62px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .historyDetailTitle {
+    width: 424px;
+    color: #000000;
+    font-size: 34px;
+    font-weight: bold;
+  }
+
+  .historyDetailMeta {
+    width: 424px;
+    color: #555555;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 6px;
+    display: none;
+  }
+
+  .historyHero {
+    height: 166px;
+  }
+
+  .historyHeroLabel {
+    font-size: 36px;
+  }
+
+  .historyHeroValue {
+    font-size: 94px;
+  }
+
+  .historyStatsGrid {
+    height: 118px;
+    margin-top: 12px;
+  }
+
+  .historyStatCard {
+    height: 118px;
+  }
+
+  .historyStatLabel {
+    font-size: 28px;
+  }
+
+  .historyStatValue {
+    font-size: 48px;
+  }
+
+  .historyWideMetric {
+    height: 112px;
+    margin-top: 12px;
+  }
+
+  .historyWideLabel {
+    font-size: 30px;
+  }
+
+  .historyWideValue {
+    font-size: 42px;
+  }
+
+  .historyDeleteButton {
+    width: 424px;
+    height: 64px;
+    border-radius: 8px;
+    background-color: #000000;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .historyDeleteText {
+    width: 400px;
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .scoreScreen {
+    width: 424px;
+    height: 602px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 14px;
+  }
+
+  .scoreHeader {
+    width: 424px;
+    height: 62px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .scoreTitle {
+    color: #000000;
+    font-size: 42px;
+    font-weight: bold;
+  }
+
+  .scoreHint {
+    color: #555555;
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .scorePanel {
+    width: 424px;
+    height: 220px;
+    border-radius: 8px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 14px;
+    padding-right: 14px;
+    margin-top: 14px;
+  }
+
+  .scorePanelHome {
+    background-color: #e8f6ee;
+  }
+
+  .scorePanelAway {
+    background-color: #eef3ff;
+  }
+
+  .scoreStepButton {
+    width: 92px;
+    height: 150px;
+    border-radius: 8px;
+    background-color: #000000;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .scorePlusButton {
+    width: 112px;
+  }
+
+  .scoreStepText {
+    width: 92px;
+    color: #ffffff;
+    font-size: 56px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .scoreMain {
+    width: 170px;
+    height: 184px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .scoreLabelRow {
+    width: 170px;
+    height: 36px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .scoreServeDot {
+    width: 22px;
+    color: #000000;
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+    margin-right: 8px;
+  }
+
+  .scoreLabel {
+    color: #333333;
+    font-size: 32px;
+    font-weight: bold;
+  }
+
+  .scoreValue {
+    color: #000000;
+    font-size: 104px;
+    font-weight: bold;
+    margin-top: 4px;
+  }
+
+  .scoreResetButton {
+    width: 424px;
+    height: 64px;
+    border-radius: 8px;
+    background-color: #f2f4f7;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 14px;
+  }
+
+  .scoreResetText {
+    color: #333333;
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+  }
+</style>
+
+<script>
+  // BEGIN GENERATED COMPETITION SWING ALGORITHM
+  const MAX_RACKET_SPEED_KMH = 260
+  const MAX_INTENSITY_INDEX = 300
+  const MAX_SHUTTLE_SPEED_KMH = 360
+
+  const MS_TO_KMH = 3.6
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, Number(value) || 0))
+  }
+
+  function clamp01(value) {
+    return clamp(value, 0, 1)
+  }
+
+  function round1(value) {
+    return Math.round((Number(value) || 0) * 10) / 10
+  }
+
+  function round2(value) {
+    return Math.round((Number(value) || 0) * 100) / 100
+  }
+
+  function clampKmh(value, maxKmh) {
+    return Math.max(0, Math.min(maxKmh, Math.round(Number(value) || 0)))
+  }
+
+  function createPlayerGeometry(profile) {
+    const heightCm = clamp(profile && profile.heightCm, 140, 210) || 175
+    const strapIndex = clamp(profile && profile.strapIndex, 0, 2)
+    const heightOffset = heightCm - 175
+    const pivotToWatch = clamp(0.62 + heightOffset * 0.006, 0.5, 0.74)
+    const watchToRacket = clamp(0.66 + heightOffset * 0.006, 0.54, 0.78)
+    let strapSpeedFactor = 1
+
+    if (strapIndex === 0) {
+      strapSpeedFactor = 1.03
+    } else if (strapIndex === 2) {
+      strapSpeedFactor = 0.92
+    }
+
+    return {
+      pivotToWatch,
+      watchToRacket,
+      strapSpeedFactor
+    }
+  }
+
+  function scoreSwingQuality(metrics) {
+    const peakAccel = Math.max(0, Number(metrics.peakAccel) || 0)
+    const peakJerk = Math.max(0, Number(metrics.peakJerk) || 0)
+    const energyIntegral = Math.max(0, Number(metrics.energyIntegral) || 0)
+    const burstRatio = Math.max(0, Number(metrics.burstRatio) || 0)
+    const directionRatio = Math.max(0, Number(metrics.directionRatio) || 0)
+    const durationMs = Math.max(0, Number(metrics.durationMs) || 0)
+    const peakLatencyMs = Math.max(0, Number(metrics.peakLatencyMs) || 0)
+    const halfWidthMs = Math.max(0, Number(metrics.halfWidthMs) || 0)
+    const intervalMs = Math.max(20, Number(metrics.intervalMs) || 20)
+    const samples = Math.max(0, Number(metrics.samples) || 0)
+    const impulse = Math.max(0, Number(metrics.impulse) || 0)
+    const runningLike = Boolean(metrics.runningLike)
+
+    const peakScore = clamp01((peakAccel - 8.8) / 30) * 0.24
+    const jerkScore = clamp01((peakJerk - 105) / 500) * 0.22
+    const energyScore = clamp01((energyIntegral - 1.25) / 17) * 0.16
+    const burstScore = clamp01((burstRatio - 1.14) / 1.35) * 0.14
+    const directionScore = clamp01((directionRatio - 0.17) / 0.42) * 0.12
+    const latencyScore = clamp01((280 - peakLatencyMs) / 230) * 0.07
+    const widthScore = clamp01((360 - halfWidthMs) / 300) * 0.05
+    const score =
+      peakScore +
+      jerkScore +
+      energyScore +
+      burstScore +
+      directionScore +
+      latencyScore +
+      widthScore
+
+    let reason = '有效'
+    if (intervalMs > 120) reason = '采样'
+    else if (samples < 3 || durationMs < 55 || durationMs > 720) reason = '时长'
+    else if (peakAccel < 10.8 || (peakJerk < 130 && peakAccel < 22)) reason = '信号'
+    else if (energyIntegral < 1.55 && peakAccel < 22) reason = '能量'
+    else if (directionRatio < 0.12) reason = '方向'
+    else if (directionRatio < 0.2 && peakAccel < 34) reason = '方向'
+    else if (peakAccel >= 55 && impulse < 1.4) reason = '冲击'
+    else if (peakLatencyMs > 300 && peakJerk < 330) reason = '摆臂'
+    else if (durationMs > 500 && peakJerk < 390) reason = '慢摆'
+    else if (halfWidthMs > 340 && peakJerk < 350) reason = '拖长'
+    else if (runningLike && score < 0.76 && peakJerk < 420) reason = '跑动'
+    else if (score < 0.58 && peakAccel < 30) reason = '形态'
+
+    const accepted = reason === '有效'
+    return {
+      accepted,
+      bestEligible: accepted && score >= 0.6 && intervalMs <= 75 && !runningLike,
+      score,
+      reason
+    }
+  }
+
+  function estimateRestitution(racketMps) {
+    return clamp(1 - 0.013 * racketMps, 0.34, 0.72)
+  }
+
+  function estimateSignalSpeedCeiling(
+    qualityScore,
+    directionRatio,
+    durationMs,
+    peakJerk,
+    recoveredAccel
+  ) {
+    let ceiling = 155
+    if (qualityScore >= 0.58 && directionRatio >= 0.24) ceiling = 180
+    if (
+      qualityScore >= 0.65 &&
+      directionRatio >= 0.29 &&
+      durationMs <= 460 &&
+      peakJerk >= 270
+    ) {
+      ceiling = 205
+    }
+    if (
+      qualityScore >= 0.73 &&
+      directionRatio >= 0.35 &&
+      durationMs <= 380 &&
+      peakJerk >= 380 &&
+      recoveredAccel >= 50
+    ) {
+      ceiling = 235
+    }
+    if (
+      qualityScore >= 0.8 &&
+      directionRatio >= 0.4 &&
+      durationMs <= 350 &&
+      peakJerk >= 500 &&
+      recoveredAccel >= 64
+    ) {
+      ceiling = MAX_RACKET_SPEED_KMH
+    }
+    return ceiling
+  }
+
+  function estimateShuttleSpeedCeiling(
+    qualityScore,
+    directionRatio,
+    durationMs,
+    peakJerk,
+    recoveredAccel,
+    racketKmh
+  ) {
+    let ceiling = 235
+    if (
+      qualityScore >= 0.65 &&
+      directionRatio >= 0.29 &&
+      durationMs <= 460 &&
+      peakJerk >= 270
+    ) {
+      ceiling = 285
+    }
+    if (
+      qualityScore >= 0.73 &&
+      directionRatio >= 0.35 &&
+      durationMs <= 380 &&
+      peakJerk >= 380 &&
+      recoveredAccel >= 50
+    ) {
+      ceiling = 320
+    }
+    if (
+      qualityScore >= 0.8 &&
+      directionRatio >= 0.4 &&
+      durationMs <= 350 &&
+      peakJerk >= 500 &&
+      recoveredAccel >= 64 &&
+      racketKmh >= 232
+    ) {
+      ceiling = MAX_SHUTTLE_SPEED_KMH
+    }
+    return ceiling
+  }
+
+  function estimateShuttleKmh(racketMps, qualityScore, maxCap) {
+    const signalQuality = clamp01(Number(qualityScore) || 0.58)
+    const restitution = estimateRestitution(racketMps)
+    const contactQuality = 0.78 + clamp01((signalQuality - 0.62) / 0.34) * 0.27
+    const shuttleMps = racketMps * (1 + restitution) * contactQuality
+    const dynamicCap =
+      signalQuality >= 0.8
+        ? MAX_SHUTTLE_SPEED_KMH
+        : signalQuality >= 0.73
+          ? 320
+          : signalQuality >= 0.65
+            ? 285
+            : 235
+    const displayCap = Math.min(
+      MAX_SHUTTLE_SPEED_KMH,
+      Math.max(180, Number(maxCap) || dynamicCap),
+      dynamicCap
+    )
+    return clampKmh(Math.round(shuttleMps * MS_TO_KMH), displayCap)
+  }
+
+  function estimateSwingMetrics(metrics, geometry) {
+    const peakAccel = Math.max(0, Number(metrics.peakAccel) || 0)
+    const peakJerk = Math.max(0, Number(metrics.peakJerk) || 0)
+    const peakEnergy = Math.max(0, Number(metrics.peakEnergy) || 0)
+    const impulse = Math.max(0, Number(metrics.impulse) || 0)
+    const dominantImpulse = Math.max(0, Number(metrics.dominantImpulse) || 0)
+    const directionRatio = Math.max(0, Number(metrics.directionRatio) || 0)
+    const burstRatio = Math.max(0, Number(metrics.burstRatio) || 0)
+    const energyIntegral = Math.max(0, Number(metrics.energyIntegral) || 0)
+    const durationMs = Math.max(60, Number(metrics.durationMs) || 180)
+    const intervalMs = Math.max(20, Number(metrics.intervalMs) || 60)
+    const qualityScore = clamp01(Number(metrics.qualityScore) || 0)
+    const halfInterval = Math.min(0.11, intervalMs / 2000)
+    const geo = geometry || createPlayerGeometry({ heightCm: 175, strapIndex: 1 })
+    const leverRatio = (geo.pivotToWatch + geo.watchToRacket) / geo.pivotToWatch
+    const recoveredAccel = Math.min(125, peakAccel + peakJerk * halfInterval * 0.22)
+    const circularProxy = Math.sqrt(recoveredAccel * geo.pivotToWatch)
+    const impulseProxy = dominantImpulse * 0.72 + impulse * 0.28
+    const wristSpeed = Math.max(circularProxy * 0.78, impulseProxy * 0.82)
+    const jerkGain = Math.min(0.22, Math.max(0, (peakJerk - 155) / 980))
+    const energyGain = Math.min(0.08, Math.max(0, (energyIntegral - 5) / 42))
+    const burstGain = Math.min(0.08, Math.max(0, (burstRatio - 1.9) / 6))
+    const compactGain = Math.min(0.08, Math.max(0, (320 - durationMs) / 1500))
+    const directionGain = Math.min(0.06, Math.max(0, (directionRatio - 0.32) / 3.5))
+    const distalGain = 1 + Math.min(0.2, Math.max(0, (recoveredAccel - 34) / 210))
+    const qualityFactor = 0.76 + clamp01((qualityScore - 0.54) / 0.3) * 0.22
+    const rawRacketKmh = Math.round(
+      wristSpeed *
+        leverRatio *
+        (1 + jerkGain + energyGain + burstGain + compactGain + directionGain) *
+        distalGain *
+        geo.strapSpeedFactor *
+        qualityFactor *
+        MS_TO_KMH
+    )
+    const signalCeiling = estimateSignalSpeedCeiling(
+      qualityScore,
+      directionRatio,
+      durationMs,
+      peakJerk,
+      recoveredAccel
+    )
+    const racketSpeedKmh = clampKmh(
+      rawRacketKmh,
+      Math.min(MAX_RACKET_SPEED_KMH, signalCeiling)
+    )
+    const racketMps = racketSpeedKmh / MS_TO_KMH
+    const shuttleCeiling = estimateShuttleSpeedCeiling(
+      qualityScore,
+      directionRatio,
+      durationMs,
+      peakJerk,
+      recoveredAccel,
+      racketSpeedKmh
+    )
+    const shuttleSpeedKmh = estimateShuttleKmh(
+      racketMps,
+      qualityScore,
+      shuttleCeiling
+    )
+    const confidence = Math.round(
+      Math.min(
+        72,
+        16 +
+          recoveredAccel * 0.22 +
+          peakJerk * 0.014 +
+          Math.min(10, energyIntegral * 0.42) +
+          Math.min(5, peakEnergy * 0.018) +
+          Math.min(7, directionRatio * 12) +
+          qualityScore * 8
+      )
+    )
+    let signalText = '中'
+    if (confidence >= 64 && directionRatio > 0.28) signalText = '强'
+    else if (confidence < 45 || directionRatio < 0.24) signalText = '弱'
+
+    return {
+      racketSpeedKmh,
+      shuttleSpeedKmh,
+      leverRatio: round2(leverRatio),
+      restitution: round2(estimateRestitution(racketMps)),
+      confidence,
+      signalText,
+      impulseText: round1(impulse)
+    }
+  }
+
+  function estimateSwingIntensityIndex(estimate, metrics) {
+    const racketKmh = clampKmh(
+      estimate && estimate.racketSpeedKmh,
+      MAX_RACKET_SPEED_KMH
+    )
+    const qualityScore = clamp01(
+      Number(metrics && metrics.qualityScore) ||
+        (Number(estimate && estimate.confidence) || 0) / 100
+    )
+    const directionRatio = Math.max(0, Number(metrics && metrics.directionRatio) || 0)
+    const durationMs = Math.max(80, Number(metrics && metrics.durationMs) || 360)
+    let speedBase = racketKmh * 0.92
+    if (racketKmh > 120 && racketKmh <= 205) {
+      speedBase = 110 + Math.pow(clamp01((racketKmh - 120) / 85), 0.78) * 112
+    } else if (racketKmh > 205) {
+      speedBase = 222 + Math.pow(clamp01((racketKmh - 205) / 55), 0.82) * 42
+    }
+    const qualityBonus = clamp01((qualityScore - 0.58) / 0.3) * 22
+    const directionBonus = clamp01((directionRatio - 0.26) / 0.2) * 14
+    const timingBonus = clamp01((410 - durationMs) / 190) * 12
+    const eliteBonus = clamp01((racketKmh - 195) / 65) * 20
+    const qualityCeiling =
+      qualityScore >= 0.82 && directionRatio >= 0.4 && durationMs <= 350
+        ? MAX_INTENSITY_INDEX
+        : qualityScore >= 0.72 && directionRatio >= 0.32 && durationMs <= 410
+          ? 275
+          : qualityScore >= 0.66 && directionRatio >= 0.28
+            ? 255
+            : 215
+    return clampKmh(
+      Math.round(speedBase + qualityBonus + directionBonus + timingBonus + eliteBonus),
+      qualityCeiling
+    )
+  }
+
+  function isRecoveryReturn(current, previous) {
+    if (!previous || Number(previous.peakAccel) <= 0) return false
+    const elapsedMs = Number(current.at) - Number(previous.at)
+    if (elapsedMs > 1050) return false
+
+    const peakRatio =
+      (Number(current.peakAccel) || 0) / Math.max(1, Number(previous.peakAccel) || 0)
+    const impulseRatio =
+      (Number(current.impulse) || 0) / Math.max(0.1, Number(previous.impulse) || 0)
+    const speedRatio =
+      (Number(current.racketSpeedKmh) || 0) /
+      Math.max(1, Number(previous.racketSpeedKmh) || 0)
+
+    if (elapsedMs < 300) return peakRatio < 1.08 && impulseRatio < 1.02
+    if (elapsedMs < 850) {
+      return (peakRatio < 0.76 && impulseRatio < 0.86) || speedRatio < 0.76
+    }
+    return peakRatio < 0.58 && impulseRatio < 0.68 && speedRatio < 0.72
+  }
+
+  const calculateRestitution = estimateRestitution
+  const calculateShuttleKmh = estimateShuttleKmh
+  const calculateShuttleSpeedCeiling = estimateShuttleSpeedCeiling
+  const calculateSignalSpeedCeiling = estimateSignalSpeedCeiling
+  const calculateSwingIntensityIndex = estimateSwingIntensityIndex
+  const calculateSwingMetrics = estimateSwingMetrics
+  const evaluateRecoveryReturn = isRecoveryReturn
+  const evaluateSwingQuality = scoreSwingQuality
+  // END GENERATED COMPETITION SWING ALGORITHM
+
+  const DEVICE_MODEL = 'Xiaomi Smart Band 10 Pro'
+  const HEART_RATE_MODE = 'poll'
+  const HEART_RATE_START_DELAY_MS = 2500
+  const HEART_RATE_POLL_INTERVAL_MS = 5000
+  const GRAVITY = 9.80665
+  const SESSION_HISTORY_KEY = 'swing_session_history_v1'
+  const MAX_HISTORY_SESSIONS = 30
+  const HISTORY_RETENTION_MS = 30 * 24 * 60 * 60 * 1000
+
+  export default {
+    private: {
+      running: false,
+      swingActive: false,
+      screenIndex: 0,
+      showControlScreen: true,
+      showMetricsScreen: false,
+      showHealthScreen: false,
+      showSettingsScreen: false,
+      showHistoryScreen: false,
+      showHistoryDetailScreen: false,
+      showScoreScreen: false,
+      touchStartX: 0,
+      touchStartY: 0,
+      touchStartAt: 0,
+      lastSwipeAt: 0,
+      modeIndex: 0,
+      profileIndex: 1,
+      handIndex: 0,
+      heightIndex: 1,
+      heightCm: 175,
+      heightInputText: '175',
+      strapIndex: 1,
+      modeName: 'BMT Smash',
+      statusText: '右手 · 标准',
+      recordStatusText: '准备开始',
+      elapsedText: '00:00',
+      currentTimeText: '--:--',
+      displayTimeText: '--:--',
+      appTitleText: 'BMT Smash',
+      clockTimerId: 0,
+      sensorButtonText: '开始',
+      controlPrimaryText: '开始',
+      controlPauseText: '暂停',
+      controlEndText: '结束',
+      sensorModeText: 'game 20ms',
+      handText: '右手',
+      heightText: '170-180',
+      strapText: '标准',
+      speedKmh: 0,
+      shuttleKmh: 0,
+      intensitySum: 0,
+      leverText: '2.06',
+      bestKmh: 0,
+      bestName: '无',
+      swingCount: 0,
+      sampleCount: 0,
+      peakMotionAccel: 0,
+      peakJerk: 0,
+      peakAccelText: '0.0',
+      energyAvg: 0,
+      sampleIntervalMs: 20,
+      lastMagnitude: 0,
+      lastTimestamp: 0,
+      gravityReady: false,
+      gravityX: 0,
+      gravityY: 0,
+      gravityZ: GRAVITY,
+      lastDynX: 0,
+      lastDynY: 0,
+      lastDynZ: 0,
+      lastSwingTimestamp: -1000000,
+      lastAcceptedPeakAccel: 0,
+      lastAcceptedImpulse: 0,
+      lastAcceptedSpeedKmh: 0,
+      warmupUntilTimestamp: 0,
+      recentPeakTime1: 0,
+      recentPeakTime2: 0,
+      recentPeakTime3: 0,
+      recentPeakAccel1: 0,
+      recentPeakAccel2: 0,
+      recentPeakAccel3: 0,
+      mediumPeakLocked: false,
+      swingStartTimestamp: 0,
+      swingLastActiveTimestamp: 0,
+      swingPeakTimestamp: 0,
+      swingPeakAccel: 0,
+      swingPeakJerk: 0,
+      swingPeakEnergy: 0,
+      swingSamples: 0,
+      swingHighSamples: 0,
+      swingQuietSamples: 0,
+      swingAccelSum: 0,
+      swingAccelSqSum: 0,
+      swingImpulse: 0,
+      swingPosX: 0,
+      swingNegX: 0,
+      swingPosY: 0,
+      swingNegY: 0,
+      swingPosZ: 0,
+      swingNegZ: 0,
+      confidence: 0,
+      stopArmedUntil: 0,
+      sessionStartTimestamp: 0,
+      sessionCreatedTimestamp: 0,
+      sessionAccumulatedMs: 0,
+      sessionEnded: false,
+      hiddenAtTimestamp: 0,
+      hiddenSampleCount: 0,
+      lastSessionSaveTimestamp: 0,
+      lastHistorySaveKey: '',
+      sessionHistory: [],
+      historyRows: [],
+      historyCountText: '0场',
+      historyListVisible: false,
+      historyEmptyVisible: true,
+      historyDetailTitle: '历史详情',
+      historyDetailMeta: '',
+      historyDetailSpeed: 0,
+      historyDetailSwings: 0,
+      historyDetailBest: 0,
+      historyDetailShuttle: 0,
+      historyDetailAverage: 0,
+      historyDetailDeleteText: '删除',
+      historyDetailDeleteKey: '',
+      historyDetailDeleteArmedUntil: 0,
+      sessionHistoryLoaded: false,
+      homeScore: 0,
+      awayScore: 0,
+      scoreStatusText: '本局',
+      serveSide: '',
+      homeServeVisible: false,
+      awayServeVisible: false,
+      message: '准备开始'
+      ,waveformText: '▁▁▁▁▁▁▁▁▁▁▁▁'
+      ,waveformStatus: '实时加速度'
+      ,waveformLevels: []
+      ,waveformLastUpdateAt: 0
+      ,waveformEventUntil: 0
+      ,heartRate: 0
+      ,heartRateText: '--'
+      ,averageHeartRate: '--'
+      ,maximumHeartRate: '--'
+      ,heartRateSum: 0
+      ,heartRateCount: 0
+      ,heartRateMax: 0
+      ,heartRateSubscribed: false
+      ,heartStartTimerId: null
+      ,heartPollTimerId: null
+      ,heartServiceFailed: false
+      ,heartReadFailures: 0
+      ,heartGeneration: 0
+      ,heartLastSampleAt: 0
+      ,heartCoveredMs: 0
+      ,estimatedCalories: 0
+      ,estimatedCaloriesText: '0.0'
+      ,heartStatusText: '等待训练开始'
+    },
+
+    onInit () {
+      this.updateScreenFlags()
+      this.updateClock()
+      this.startClock()
+      this.refreshControlText()
+      this.loadUserSettings()
+      this.loadSessionSnapshot()
+      this.loadSessionHistory()
+    },
+
+    onHide () {
+      if (this.running) {
+        this.hiddenAtTimestamp = Date.now()
+        this.hiddenSampleCount = this.sampleCount
+        this.saveSessionSnapshot()
+      }
+    },
+
+    onBackPress () {
+      if (!this.running) return false
+      this.recordStatusText = '训练中, 请用结束按钮'
+      this.message = '已防止按键误退出'
+      this.saveSessionSnapshot(true)
+      return true
+    },
+
+    onDestroy () {
+      const resumeOnNextLaunch = this.running && !this.sessionEnded
+      const now = Date.now()
+      if (resumeOnNextLaunch && this.sessionStartTimestamp > 0) {
+        this.sessionAccumulatedMs = this.sessionAccumulatedMs + Math.max(0, now - this.sessionStartTimestamp)
+        this.sessionStartTimestamp = 0
+      }
+      this.running = false
+      this.stopClock()
+      try {
+        const sensor = require('@system.sensor')
+        sensor.unsubscribeAccelerometer()
+      } catch (err) {}
+      this.stopHeartRate()
+      this.saveSessionSnapshot(resumeOnNextLaunch)
+      this.setKeepScreen(false)
+    },
+
+    onShow () {
+      this.updateClock()
+      this.startClock()
+      if (!this.running || this.hiddenAtTimestamp <= 0) {
+        return
+      }
+
+      const deltaSamples = this.sampleCount - this.hiddenSampleCount
+      const hiddenSeconds = Math.max(1, Math.round((Date.now() - this.hiddenAtTimestamp) / 1000))
+
+      if (deltaSamples > 3) {
+        this.recordStatusText = '后台继续 ' + hiddenSeconds + '秒'
+      } else {
+        this.restartSensorsAfterBackground()
+        this.recordStatusText = '已自动恢复记录'
+      }
+
+      this.hiddenAtTimestamp = 0
+      this.hiddenSampleCount = 0
+      this.refreshControlText()
+      this.saveSessionSnapshot()
+    },
+
+    restartSensorsAfterBackground () {
+      try {
+        const sensor = require('@system.sensor')
+        sensor.unsubscribeAccelerometer()
+      } catch (err) {}
+      this.running = false
+      this.stopHeartRate()
+      this.subscribeAccelerometer('game')
+      this.startHeartRate()
+      this.setKeepScreen(true)
+    },
+
+    startClock () {
+      if (this.clockTimerId) {
+        return
+      }
+
+      const vm = this
+      try {
+        this.clockTimerId = setInterval(function () {
+          vm.updateClock()
+        }, 30000)
+      } catch (err) {}
+    },
+
+    stopClock () {
+      if (!this.clockTimerId) {
+        return
+      }
+
+      try {
+        clearInterval(this.clockTimerId)
+      } catch (err) {}
+      this.clockTimerId = 0
+    },
+
+    updateClock () {
+      const now = new Date()
+      const hour = now.getHours()
+      const minute = now.getMinutes()
+      const hourText = hour < 10 ? '0' + hour : '' + hour
+      const minuteText = minute < 10 ? '0' + minute : '' + minute
+      this.currentTimeText = hourText + ':' + minuteText
+      this.displayTimeText = this.currentTimeText
+      if (this.running) {
+        this.saveSessionSnapshot(true)
+      }
+    },
+
+    showControl () {
+      this.screenIndex = 0
+      this.updateScreenFlags()
+    },
+
+    showMetrics () {
+      this.screenIndex = 1
+      this.updateScreenFlags()
+    },
+
+    showSettings () {
+      this.screenIndex = 3
+      this.updateScreenFlags()
+    },
+
+    showHistoryList () {
+      this.loadSessionHistory()
+      this.screenIndex = 4
+      this.updateScreenFlags()
+    },
+
+    showHistoryDetail () {
+      this.screenIndex = 5
+      this.updateScreenFlags()
+    },
+
+    showScore () {
+      this.screenIndex = 6
+      this.updateScreenFlags()
+    },
+
+    updateScreenFlags () {
+      this.showControlScreen = this.screenIndex === 0
+      this.showMetricsScreen = this.screenIndex === 1
+      this.showHealthScreen = this.screenIndex === 2
+      this.showSettingsScreen = this.screenIndex === 3
+      this.showHistoryScreen = this.screenIndex === 4
+      this.showHistoryDetailScreen = this.screenIndex === 5
+      this.showScoreScreen = this.screenIndex === 6
+      this.refreshTopBar()
+    },
+
+    refreshTopBar () {
+      const vm = this
+      this.appTitleText = 'B'
+      this.displayTimeText = ''
+      try {
+        setTimeout(function () {
+          vm.appTitleText = 'BMT Smash'
+          vm.displayTimeText = vm.currentTimeText
+        }, 40)
+      } catch (err) {
+        this.appTitleText = 'BMT Smash'
+        this.displayTimeText = this.currentTimeText
+      }
+    },
+
+    nextScreen () {
+      if (this.screenIndex < 4) {
+        this.screenIndex = this.screenIndex + 1
+        if (this.screenIndex === 4) {
+          this.loadSessionHistory()
+        }
+        this.updateScreenFlags()
+        return
+      }
+
+      if (this.screenIndex === 4) {
+        this.showScore()
+      }
+    },
+
+    prevScreen () {
+      if (this.screenIndex === 6) {
+        this.screenIndex = 4
+        this.updateScreenFlags()
+        return
+      }
+
+      if (this.screenIndex === 5) {
+        this.screenIndex = 4
+        this.updateScreenFlags()
+        return
+      }
+
+      if (this.screenIndex === 4) {
+        this.screenIndex = 3
+        this.updateScreenFlags()
+        return
+      }
+
+      if (this.screenIndex > 0) {
+        this.screenIndex = this.screenIndex - 1
+        this.updateScreenFlags()
+      }
+    },
+
+    onPageSwipe (evt) {
+      const now = Date.now()
+      if (now - this.lastSwipeAt < 260) {
+        return
+      }
+
+      const direction = this.readSwipeDirection(evt)
+      if (direction === 'left') {
+        this.lastSwipeAt = now
+        this.handleLeftSwipe()
+      } else if (direction === 'right') {
+        this.lastSwipeAt = now
+        this.prevScreen()
+      }
+    },
+
+    onPageTouchStart (evt) {
+      const point = this.readTouchPoint(evt)
+      this.touchStartX = point.x
+      this.touchStartY = point.y
+      this.touchStartAt = Date.now()
+    },
+
+    onPageTouchEnd (evt) {
+      const now = Date.now()
+      if (now - this.lastSwipeAt < 260 || this.touchStartAt <= 0) {
+        return
+      }
+
+      const point = this.readTouchPoint(evt)
+      const dx = point.x - this.touchStartX
+      const dy = point.y - this.touchStartY
+      const dt = now - this.touchStartAt
+
+      this.touchStartAt = 0
+      if (dt > 900) {
+        return
+      }
+
+      if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.25) {
+        return
+      }
+
+      this.lastSwipeAt = now
+      if (dx < 0) {
+        this.handleLeftSwipe()
+      } else {
+        this.prevScreen()
+      }
+    },
+
+    handleLeftSwipe () {
+      this.nextScreen()
+    },
+
+    exitApp () {
+      if (this.running) {
+        this.pauseSession()
+      } else {
+        this.saveSessionSnapshot()
+      }
+      this.setKeepScreen(false)
+      try {
+        const router = require('@system.router')
+        router.back()
+      } catch (err) {
+        this.recordStatusText = '已结束, 左滑退出'
+        this.message = '退出失败'
+      }
+    },
+
+    readSwipeDirection (evt) {
+      if (!evt) {
+        return ''
+      }
+
+      const value = evt.direction || evt.directionName || evt.swipeDirection || evt.type || ''
+      return ('' + value).toLowerCase()
+    },
+
+    readTouchPoint (evt) {
+      let point = evt
+      if (evt && evt.changedTouches && evt.changedTouches.length > 0) {
+        point = evt.changedTouches[0]
+      } else if (evt && evt.touches && evt.touches.length > 0) {
+        point = evt.touches[0]
+      }
+
+      return {
+        x: Number(point && (point.pageX || point.clientX || point.x)) || 0,
+        y: Number(point && (point.pageY || point.clientY || point.y)) || 0
+      }
+    },
+
+    refreshControlText () {
+      if (this.running) {
+        this.controlPrimaryText = '记录中'
+        this.controlPauseText = '暂停'
+        this.controlEndText = '结束'
+        this.sensorButtonText = '结束本场'
+        return
+      }
+
+      if (this.sessionEnded) {
+        this.controlPrimaryText = '新训练'
+        this.controlPauseText = '清空'
+        this.controlEndText = '结束'
+        this.sensorButtonText = '开始'
+        return
+      }
+
+      if (this.sessionAccumulatedMs > 0 || this.swingCount > 0 || this.bestKmh > 0) {
+        this.controlPrimaryText = '继续'
+        this.controlPauseText = '暂停'
+        this.controlEndText = '结束'
+        this.sensorButtonText = '继续'
+        return
+      }
+
+      this.controlPrimaryText = '开始'
+      this.controlPauseText = '暂停'
+      this.controlEndText = '结束'
+      this.sensorButtonText = '开始'
+    },
+
+    startOrResumeSession () {
+      if (this.running) {
+        this.showMetrics()
+        return
+      }
+
+      if (this.sessionEnded) {
+        this.resetSession()
+      }
+
+      if (this.sessionAccumulatedMs > 0 || this.swingCount > 0 || this.bestKmh > 0) {
+        this.resumeSensor()
+      } else {
+        this.startSensor()
+      }
+
+      this.refreshControlText()
+      this.showMetrics()
+    },
+
+    pauseSession () {
+      if (!this.running) {
+        if (this.sessionEnded) {
+          this.resetSession()
+          this.showControl()
+          return
+        }
+
+        this.message = '当前未记录'
+        this.refreshControlText()
+        return
+      }
+
+      const now = Date.now()
+      this.running = false
+      if (this.swingActive) {
+        this.finishSwing(now)
+      }
+
+      try {
+        const sensor = require('@system.sensor')
+        sensor.unsubscribeAccelerometer()
+      } catch (err) {
+        this.message = '暂停时捕获异常'
+      }
+      this.stopHeartRate()
+
+      if (this.sessionStartTimestamp > 0) {
+        this.sessionAccumulatedMs = this.sessionAccumulatedMs + Math.max(0, now - this.sessionStartTimestamp)
+      }
+      this.sessionStartTimestamp = 0
+      this.sessionEnded = false
+      this.hiddenAtTimestamp = 0
+      this.hiddenSampleCount = 0
+      this.modeName = '已暂停'
+      this.recordStatusText = '已暂停'
+      this.message = '已暂停'
+      this.setKeepScreen(false)
+      this.updateElapsed(now)
+      this.refreshControlText()
+      this.saveSessionSnapshot()
+      this.showControl()
+    },
+
+    finishSession () {
+      this.message = '结束按钮已触发'
+      if (this.sessionEnded && !this.running) {
+        this.recordStatusText = '已结束'
+        this.refreshControlText()
+        return
+      }
+
+      if (this.running) {
+        this.stopSensor()
+        return
+      }
+
+      if (this.sessionAccumulatedMs > 0 || this.swingCount > 0 || this.bestKmh > 0) {
+        this.sessionEnded = true
+        this.modeName = '本场完成'
+        this.recordStatusText = '已结束'
+        this.message = '已结束, 最高强度 ' + this.bestKmh
+        this.updateElapsed(Date.now())
+        this.refreshControlText()
+        this.saveSessionSnapshot()
+        this.saveSessionHistory()
+        this.showControl()
+      }
+    },
+
+    toggleSensor () {
+      if (this.running) {
+        const now = Date.now()
+        if (now < this.stopArmedUntil) {
+          this.stopSensor()
+          return
+        }
+        this.stopArmedUntil = now + 1800
+        this.sensorButtonText = '再点停止'
+        this.recordStatusText = '再点一次结束'
+        this.message = '再点一次停止采样'
+        return
+      }
+
+      this.startOrResumeSession()
+    },
+
+    cycleHand () {
+      if (this.running) {
+        this.message = '采样中已锁定, 先停止'
+        return
+      }
+
+      this.handIndex = (this.handIndex + 1) % 2
+      this.updateSettingsText()
+      this.saveUserSettings()
+    },
+
+    cycleHeight () {
+      this.increaseHeight()
+    },
+
+    decreaseHeight () {
+      this.setHeightCm(this.heightCm - 1)
+    },
+
+    increaseHeight () {
+      this.setHeightCm(this.heightCm + 1)
+    },
+
+    changeHeight (evt) {
+      let value = evt
+      if (evt && evt.value !== undefined) {
+        value = evt.value
+      } else if (evt && evt.detail && evt.detail.value !== undefined) {
+        value = evt.detail.value
+      } else if (evt && evt.text !== undefined) {
+        value = evt.text
+      }
+
+      this.setHeightCm(value)
+    },
+
+    setHeightCm (value) {
+      if (this.running) {
+        this.message = '采样中已锁定, 先停止'
+        this.heightInputText = '' + this.heightCm
+        return
+      }
+
+      this.heightCm = this.clampHeightCm(value)
+      this.heightIndex = this.heightProfileIndex(this.heightCm)
+      this.profileIndex = this.heightIndex
+      this.updateSettingsText()
+      this.saveUserSettings()
+    },
+
+    cycleStrap () {
+      if (this.running) {
+        this.message = '采样中已锁定, 先停止'
+        return
+      }
+
+      this.strapIndex = (this.strapIndex + 1) % 3
+      this.updateSettingsText()
+      this.saveUserSettings()
+    },
+
+    increaseHomeScore () {
+      this.changeScore('home', 1)
+    },
+
+    decreaseHomeScore () {
+      this.changeScore('home', -1)
+    },
+
+    increaseAwayScore () {
+      this.changeScore('away', 1)
+    },
+
+    decreaseAwayScore () {
+      this.changeScore('away', -1)
+    },
+
+    changeScore (side, delta) {
+      const value = Math.round(Number(delta) || 0)
+      if (!value) {
+        return
+      }
+
+      if (side === 'away') {
+        this.awayScore = Math.max(0, Math.min(99, this.awayScore + value))
+      } else {
+        this.homeScore = Math.max(0, Math.min(99, this.homeScore + value))
+      }
+
+      if (value > 0) {
+        this.updateServeSide(side)
+      }
+
+      this.scoreStatusText = this.homeScore + ':' + this.awayScore
+      this.message = '比分 ' + this.scoreStatusText
+      this.saveSessionSnapshot()
+    },
+
+    updateServeSide (side) {
+      if (side === 'away') {
+        this.serveSide = 'away'
+        this.homeServeVisible = false
+        this.awayServeVisible = true
+        return
+      }
+
+      if (side === 'home') {
+        this.serveSide = 'home'
+        this.homeServeVisible = true
+        this.awayServeVisible = false
+        return
+      }
+
+      this.serveSide = ''
+      this.homeServeVisible = false
+      this.awayServeVisible = false
+    },
+
+    resetScore () {
+      this.homeScore = 0
+      this.awayScore = 0
+      this.scoreStatusText = '本局'
+      this.updateServeSide('')
+      this.message = '比分已清零'
+      this.saveSessionSnapshot()
+    },
+
+    updateSettingsText () {
+      this.handText = this.handIndex === 0 ? '右手' : '左手'
+
+      this.heightCm = this.clampHeightCm(this.heightCm)
+      this.heightIndex = this.heightProfileIndex(this.heightCm)
+      this.heightText = this.heightCm + 'cm'
+      this.heightInputText = '' + this.heightCm
+
+      if (this.strapIndex === 0) {
+        this.strapText = '偏紧'
+      } else if (this.strapIndex === 2) {
+        this.strapText = '偏松'
+      } else {
+        this.strapText = '标准'
+      }
+
+      this.profileIndex = this.heightIndex
+      this.statusText = this.handText + ' · ' + this.strapText
+      this.refreshControlText()
+      this.message = '已保存: ' + this.handText + ' ' + this.heightText + ' ' + this.strapText
+    },
+
+    loadUserSettings () {
+      const vm = this
+      try {
+        const storage = require('@system.storage')
+        storage.get({
+          key: 'swing_user_settings_v1',
+          default: '',
+          success: function (data) {
+            let raw = ''
+            if (typeof data === 'string') {
+              raw = data
+            } else if (data && typeof data.value === 'string') {
+              raw = data.value
+            }
+
+            if (raw) {
+              try {
+                const saved = JSON.parse(raw)
+                vm.handIndex = vm.toSettingIndex(saved.handIndex, 0, 1, 0)
+                if (saved.heightCm !== undefined) {
+                  vm.heightCm = vm.clampHeightCm(saved.heightCm)
+                } else {
+                  vm.heightIndex = vm.toSettingIndex(saved.heightIndex, 0, 2, 1)
+                  vm.heightCm = vm.heightCmFromIndex(vm.heightIndex)
+                }
+                vm.strapIndex = vm.toSettingIndex(saved.strapIndex, 0, 2, 1)
+              } catch (err) {}
+            }
+
+            vm.updateSettingsText()
+            vm.message = '设置已载入'
+          },
+          fail: function () {
+            vm.updateSettingsText()
+          }
+        })
+      } catch (err) {
+        this.updateSettingsText()
+      }
+    },
+
+    saveUserSettings () {
+      try {
+        const storage = require('@system.storage')
+        storage.set({
+          key: 'swing_user_settings_v1',
+          value: JSON.stringify({
+            handIndex: this.handIndex,
+            heightIndex: this.heightIndex,
+            heightCm: this.heightCm,
+            strapIndex: this.strapIndex
+          })
+        })
+      } catch (err) {}
+    },
+
+    setKeepScreen (keep) {
+      try {
+        const brightness = require('@system.brightness')
+        brightness.setKeepScreenOn({
+          keepScreenOn: keep
+        })
+      } catch (err) {}
+    },
+
+    saveSessionSnapshot (resumeRunning) {
+      try {
+        const storage = require('@system.storage')
+        const now = Date.now()
+        const activeSegmentMs = this.running && this.sessionStartTimestamp > 0
+          ? Math.max(0, now - this.sessionStartTimestamp)
+          : 0
+        const snapshotAccumulatedMs = this.sessionAccumulatedMs + activeSegmentMs
+        const snapshotStartTimestamp = this.running ? now : this.sessionStartTimestamp
+        storage.set({
+          key: 'swing_session_v1',
+          value: JSON.stringify({
+            savedAt: now,
+            running: resumeRunning === true ? true : this.running,
+            sessionStartTimestamp: snapshotStartTimestamp,
+            sessionCreatedTimestamp: this.sessionCreatedTimestamp,
+            sessionAccumulatedMs: snapshotAccumulatedMs,
+            sessionEnded: this.sessionEnded,
+            elapsedText: this.elapsedText,
+            speedKmh: this.speedKmh,
+            shuttleKmh: this.shuttleKmh,
+            intensitySum: this.intensitySum,
+            bestKmh: this.bestKmh,
+            bestName: this.bestName,
+            swingCount: this.swingCount,
+            sampleCount: this.sampleCount,
+            peakMotionAccel: this.peakMotionAccel,
+            peakJerk: this.peakJerk,
+            peakAccelText: this.peakAccelText,
+            homeScore: this.homeScore,
+            awayScore: this.awayScore,
+            serveSide: this.serveSide,
+            sensorModeText: this.sensorModeText,
+            heartRate: this.heartRate,
+            heartRateSum: this.heartRateSum,
+            heartRateCount: this.heartRateCount,
+            heartRateMax: this.heartRateMax,
+            heartCoveredMs: this.heartCoveredMs,
+            estimatedCalories: this.estimatedCalories
+          })
+        })
+        this.lastSessionSaveTimestamp = now
+      } catch (err) {}
+    },
+
+    buildSessionSummary () {
+      const now = Date.now()
+      const activeMs = this.sessionStartTimestamp > 0
+        ? this.sessionAccumulatedMs + Math.max(0, now - this.sessionStartTimestamp)
+        : this.sessionAccumulatedMs
+      const createdAt = this.sessionCreatedTimestamp > 0 ? this.sessionCreatedTimestamp : now
+
+      return {
+        id: '' + createdAt,
+        startedAt: createdAt,
+        endedAt: now,
+        durationMs: Math.max(0, activeMs),
+        elapsedText: this.elapsedText,
+        speedKmh: this.clampKmh(this.speedKmh, MAX_INTENSITY_INDEX),
+        swingCount: Math.max(0, Math.round(Number(this.swingCount) || 0)),
+        averageIntensity: this.averageIntensity(),
+        bestKmh: this.clampKmh(this.bestKmh, MAX_INTENSITY_INDEX),
+        shuttleKmh: this.clampKmh(this.shuttleKmh, MAX_SHUTTLE_SPEED_KMH),
+        homeScore: Math.max(0, Math.min(99, Math.round(Number(this.homeScore) || 0))),
+        awayScore: Math.max(0, Math.min(99, Math.round(Number(this.awayScore) || 0))),
+        serveSide: this.serveSide,
+        sampleCount: Math.max(0, Math.round(Number(this.sampleCount) || 0)),
+        handText: this.handText,
+        heightCm: this.heightCm,
+        strapText: this.strapText,
+        sensorModeText: this.sensorModeText,
+        currentHeartRate: Math.max(0, Math.round(Number(this.heartRate) || 0)),
+        averageHeartRate: this.heartRateCount > 0 ? Math.round(this.heartRateSum / this.heartRateCount) : 0,
+        maximumHeartRate: Math.max(0, Math.round(Number(this.heartRateMax) || 0)),
+        heartRateSampleCount: Math.max(0, Math.round(Number(this.heartRateCount) || 0)),
+        heartRateCoveredMs: Math.max(0, Math.round(Number(this.heartCoveredMs) || 0)),
+        estimatedCalories: Math.max(0, Math.round(this.estimatedCalories * 10) / 10),
+        calorieMethod: 'heart-rate-height-met-estimate-v2',
+        type: 'bmts_session_end',
+        appVersion: '0.1.0-contest',
+        algorithmVersion: 'accel-v3+hr-v1-contest',
+        deviceModel: DEVICE_MODEL
+      }
+    },
+
+    averageIntensity () {
+      const count = Math.max(0, Math.round(Number(this.swingCount) || 0))
+      if (count <= 0) {
+        return 0
+      }
+      if ((Number(this.intensitySum) || 0) <= 0) {
+        return this.clampKmh(this.speedKmh, MAX_INTENSITY_INDEX)
+      }
+      const average = Math.round((Number(this.intensitySum) || 0) / count)
+      return this.clampKmh(average, MAX_INTENSITY_INDEX)
+    },
+
+    saveSessionHistory () {
+      const summary = this.buildSessionSummary()
+      const historyKey = summary.id + ':' + summary.endedAt + ':' + summary.swingCount + ':' + summary.bestKmh
+      if (historyKey === this.lastHistorySaveKey) {
+        return
+      }
+
+      if (summary.durationMs <= 0 && summary.swingCount <= 0 && summary.bestKmh <= 0) {
+        return
+      }
+
+      const vm = this
+      try {
+        const storage = require('@system.storage')
+        storage.get({
+          key: SESSION_HISTORY_KEY,
+          default: '',
+          success: function (data) {
+            let raw = ''
+            if (typeof data === 'string') {
+              raw = data
+            } else if (data && typeof data.value === 'string') {
+              raw = data.value
+            }
+
+            let history = []
+            if (raw) {
+              try {
+                const parsed = JSON.parse(raw)
+                if (parsed && parsed.length) {
+                  history = parsed
+                }
+              } catch (err) {
+                history = []
+              }
+            }
+
+            const cutoff = Date.now() - HISTORY_RETENTION_MS
+            const nextHistory = [summary]
+            for (let i = 0; i < history.length && nextHistory.length < MAX_HISTORY_SESSIONS; i++) {
+              const item = history[i]
+              if (!item || item.id === summary.id) {
+                continue
+              }
+              if ((Number(item.endedAt) || 0) < cutoff) {
+                continue
+              }
+              nextHistory.push(item)
+            }
+
+            storage.set({
+              key: SESSION_HISTORY_KEY,
+              value: JSON.stringify(nextHistory)
+            })
+            vm.sessionHistory = nextHistory
+            vm.updateHistoryRows()
+            vm.lastHistorySaveKey = historyKey
+          },
+          fail: function () {
+            storage.set({
+              key: SESSION_HISTORY_KEY,
+              value: JSON.stringify([summary])
+            })
+            vm.sessionHistory = [summary]
+            vm.updateHistoryRows()
+            vm.lastHistorySaveKey = historyKey
+          }
+        })
+      } catch (err) {
+      }
+    },
+
+    loadSessionHistory () {
+      const vm = this
+      try {
+        const storage = require('@system.storage')
+        storage.get({
+          key: SESSION_HISTORY_KEY,
+          default: '',
+          success: function (data) {
+            let raw = ''
+            if (typeof data === 'string') {
+              raw = data
+            } else if (data && typeof data.value === 'string') {
+              raw = data.value
+            }
+
+            let history = []
+            if (raw) {
+              try {
+                const parsed = JSON.parse(raw)
+                if (parsed && parsed.length) {
+                  history = parsed
+                }
+              } catch (err) {
+                history = []
+              }
+            }
+
+            vm.sessionHistory = vm.normalizeHistory(history)
+            vm.sessionHistoryLoaded = true
+            vm.updateHistoryRows()
+          },
+          fail: function () {
+            vm.sessionHistory = []
+            vm.sessionHistoryLoaded = true
+            vm.updateHistoryRows()
+          }
+        })
+      } catch (err) {
+        this.sessionHistory = []
+        this.sessionHistoryLoaded = true
+        this.updateHistoryRows()
+      }
+    },
+
+    normalizeHistory (history) {
+      const cutoff = Date.now() - HISTORY_RETENTION_MS
+      const result = []
+      for (let i = 0; i < history.length && result.length < MAX_HISTORY_SESSIONS; i++) {
+        const item = history[i]
+        if (!item || (Number(item.endedAt) || 0) < cutoff) {
+          continue
+        }
+        result.push(item)
+      }
+      return result
+    },
+
+    updateHistoryRows () {
+      const history = this.sessionHistory || []
+      this.historyRows = this.formatHistoryRows(history)
+      this.historyCountText = history.length + '场'
+      this.historyListVisible = history.length > 0
+      this.historyEmptyVisible = history.length <= 0
+    },
+
+    formatHistoryRows (history) {
+      const rows = []
+      for (let i = 0; i < history.length; i++) {
+        const item = history[i]
+        if (!item) {
+          continue
+        }
+        rows.push({
+          title: this.formatHistoryDate(item.endedAt) + '  ' + this.formatDurationShort(item.durationMs),
+          meta: (item.swingCount || 0) + '次 · 最高' + (item.bestKmh || 0),
+          id: item.id,
+          endedAt: item.endedAt,
+          durationMs: item.durationMs,
+          handText: item.handText,
+          strapText: item.strapText,
+          speedKmh: item.speedKmh,
+          averageIntensity: item.averageIntensity,
+          swingCount: item.swingCount,
+          bestKmh: item.bestKmh,
+          shuttleKmh: item.shuttleKmh,
+          homeScore: item.homeScore,
+          awayScore: item.awayScore,
+          serveSide: item.serveSide
+        })
+      }
+      return rows
+    },
+
+    openHistoryItem (index, item) {
+      if (!item) {
+        const rows = this.historyRows || []
+        item = rows[index]
+      }
+      if (!item) {
+        return
+      }
+
+      this.historyDetailTitle = this.formatHistoryDate(item.endedAt) + '  ' + this.formatDurationCompact(item.durationMs)
+      this.historyDetailMeta = ''
+      this.historyDetailSpeed = this.clampKmh(item.speedKmh, MAX_INTENSITY_INDEX)
+      this.historyDetailSwings = Math.max(0, Math.round(Number(item.swingCount) || 0))
+      this.historyDetailBest = this.clampKmh(item.bestKmh, MAX_INTENSITY_INDEX)
+      this.historyDetailShuttle = this.clampKmh(item.shuttleKmh, MAX_SHUTTLE_SPEED_KMH)
+      this.historyDetailAverage = this.clampKmh(item.averageIntensity || item.speedKmh, MAX_INTENSITY_INDEX)
+      this.historyDetailDeleteText = '删除'
+      this.historyDetailDeleteArmedUntil = 0
+      this.historyDetailDeleteKey = this.historyItemKey(item)
+      this.showHistoryDetail()
+    },
+
+    deleteHistoryItem () {
+      const key = this.historyDetailDeleteKey
+      if (!key) {
+        this.message = '未选中记录'
+        return
+      }
+
+      const now = Date.now()
+      if (this.historyDetailDeleteText !== '再按删除' || now > this.historyDetailDeleteArmedUntil) {
+        this.historyDetailDeleteText = '再按删除'
+        this.historyDetailDeleteArmedUntil = now + 3000
+        this.message = '再次点击删除'
+        return
+      }
+
+      const history = this.sessionHistory || []
+      const nextHistory = []
+      for (let i = 0; i < history.length; i++) {
+        const item = history[i]
+        if (this.historyItemKey(item) !== key) {
+          nextHistory.push(item)
+        }
+      }
+
+      this.persistHistory(nextHistory)
+      this.sessionHistory = nextHistory
+      this.updateHistoryRows()
+      this.historyDetailDeleteText = '删除'
+      this.historyDetailDeleteArmedUntil = 0
+      this.historyDetailDeleteKey = ''
+      this.message = '已删除'
+      this.screenIndex = 4
+      this.updateScreenFlags()
+    },
+
+    persistHistory (history) {
+      try {
+        const storage = require('@system.storage')
+        storage.set({
+          key: SESSION_HISTORY_KEY,
+          value: JSON.stringify(history || [])
+        })
+      } catch (err) {}
+    },
+
+    historyItemKey (item) {
+      if (!item) {
+        return ''
+      }
+      if (item.id) {
+        return '' + item.id
+      }
+      return '' + (Number(item.endedAt) || 0) + ':' +
+        (Number(item.durationMs) || 0) + ':' +
+        (Number(item.swingCount) || 0) + ':' +
+        (Number(item.bestKmh) || 0)
+    },
+
+    formatHistoryDate (value) {
+      const date = new Date(Number(value) || Date.now())
+      const month = date.getMonth() + 1
+      const day = date.getDate()
+      const hour = date.getHours()
+      const minute = date.getMinutes()
+      const monthText = month < 10 ? '0' + month : '' + month
+      const dayText = day < 10 ? '0' + day : '' + day
+      const hourText = hour < 10 ? '0' + hour : '' + hour
+      const minuteText = minute < 10 ? '0' + minute : '' + minute
+      return monthText + '-' + dayText + ' ' + hourText + ':' + minuteText
+    },
+
+    formatDuration (value) {
+      const totalSeconds = Math.max(0, Math.floor((Number(value) || 0) / 1000))
+      const minutes = Math.floor(totalSeconds / 60)
+      const seconds = totalSeconds % 60
+      if (minutes >= 60) {
+        const hours = Math.floor(minutes / 60)
+        const remainMinutes = minutes % 60
+        return hours + '时' + remainMinutes + '分'
+      }
+      return minutes + '分' + seconds + '秒'
+    },
+
+    formatDurationShort (value) {
+      const totalSeconds = Math.max(0, Math.floor((Number(value) || 0) / 1000))
+      const minutes = Math.floor(totalSeconds / 60)
+      if (minutes >= 60) {
+        const hours = Math.floor(minutes / 60)
+        const remainMinutes = minutes % 60
+        return hours + '时' + remainMinutes + '分'
+      }
+      return minutes + '分'
+    },
+
+    formatDurationCompact (value) {
+      const totalSeconds = Math.max(0, Math.floor((Number(value) || 0) / 1000))
+      const minutes = Math.floor(totalSeconds / 60)
+      const seconds = totalSeconds % 60
+      if (minutes >= 60) {
+        const hours = Math.floor(minutes / 60)
+        const remainMinutes = minutes % 60
+        return hours + '时' + remainMinutes + '分'
+      }
+      return minutes + '分' + seconds + 's'
+    },
+
+    loadSessionSnapshot () {
+      const vm = this
+      try {
+        const storage = require('@system.storage')
+        storage.get({
+          key: 'swing_session_v1',
+          default: '',
+          success: function (data) {
+            let raw = ''
+            if (typeof data === 'string') {
+              raw = data
+            } else if (data && typeof data.value === 'string') {
+              raw = data.value
+            }
+
+            if (!raw) {
+              return
+            }
+
+            try {
+              const saved = JSON.parse(raw)
+              vm.restoreSessionSnapshot(saved)
+            } catch (err) {}
+          }
+        })
+      } catch (err) {}
+    },
+
+    restoreSessionSnapshot (saved) {
+      const now = Date.now()
+      const savedAt = Number(saved.savedAt) || 0
+      const ageMs = savedAt > 0 ? now - savedAt : 100000000
+
+      if (ageMs > 6 * 60 * 60 * 1000) {
+        return
+      }
+
+      this.sessionStartTimestamp = Number(saved.sessionStartTimestamp) || 0
+      this.sessionCreatedTimestamp = Number(saved.sessionCreatedTimestamp) || savedAt || 0
+      this.sessionAccumulatedMs = Math.max(0, Number(saved.sessionAccumulatedMs) || 0)
+      this.sessionEnded = !!saved.sessionEnded
+      this.speedKmh = this.clampKmh(saved.speedKmh, MAX_INTENSITY_INDEX)
+      this.shuttleKmh = this.clampKmh(saved.shuttleKmh, MAX_SHUTTLE_SPEED_KMH)
+      this.intensitySum = Math.max(0, Math.round(Number(saved.intensitySum) || 0))
+      this.bestKmh = this.clampKmh(saved.bestKmh, MAX_INTENSITY_INDEX)
+      this.bestName = saved.bestName || '本场'
+      this.swingCount = Math.max(0, Math.round(Number(saved.swingCount) || 0))
+      this.sampleCount = Math.max(0, Math.round(Number(saved.sampleCount) || 0))
+      this.peakMotionAccel = Math.max(0, Number(saved.peakMotionAccel) || 0)
+      this.peakJerk = Math.max(0, Number(saved.peakJerk) || 0)
+      this.peakAccelText = saved.peakAccelText || this.round1(this.peakMotionAccel)
+      this.homeScore = Math.max(0, Math.min(99, Math.round(Number(saved.homeScore) || 0)))
+      this.awayScore = Math.max(0, Math.min(99, Math.round(Number(saved.awayScore) || 0)))
+      this.scoreStatusText = this.homeScore + ':' + this.awayScore
+      this.updateServeSide(saved.serveSide || '')
+      this.sensorModeText = saved.sensorModeText || this.sensorModeText
+      this.heartRate = Math.max(0, Math.round(Number(saved.heartRate) || 0))
+      this.heartRateText = this.heartRate > 0 ? '' + this.heartRate : '--'
+      this.heartRateSum = Math.max(0, Number(saved.heartRateSum) || 0)
+      this.heartRateCount = Math.max(0, Math.round(Number(saved.heartRateCount) || 0))
+      this.heartRateMax = Math.max(0, Math.round(Number(saved.heartRateMax) || 0))
+      this.maximumHeartRate = this.heartRateMax > 0 ? '' + this.heartRateMax : '--'
+      this.averageHeartRate = this.heartRateCount > 0 ? '' + Math.round(this.heartRateSum / this.heartRateCount) : '--'
+      this.heartCoveredMs = Math.max(0, Number(saved.heartCoveredMs) || 0)
+      this.estimatedCalories = Math.max(0, Number(saved.estimatedCalories) || 0)
+      this.estimatedCaloriesText = this.formatCalories(this.estimatedCalories)
+      this.updateElapsed(now)
+
+      if (saved.running) {
+        this.sessionStartTimestamp = 0
+        this.modeName = '训练中'
+        this.recordStatusText = '已恢复记录'
+        this.resumeSensor()
+      } else if (this.sessionEnded) {
+        this.modeName = '本场完成'
+        this.recordStatusText = '已恢复上次'
+        this.refreshControlText()
+      } else if (this.swingCount > 0 || this.bestKmh > 0 || this.sessionAccumulatedMs > 0) {
+        this.modeName = '已暂停'
+        this.recordStatusText = '已恢复暂停'
+        this.refreshControlText()
+      }
+    },
+
+    resumeSensor () {
+      this.stopArmedUntil = 0
+      this.hiddenAtTimestamp = 0
+      this.hiddenSampleCount = 0
+      if (this.sessionCreatedTimestamp <= 0) {
+        this.sessionCreatedTimestamp = Date.now()
+      }
+      if (this.sessionStartTimestamp <= 0) {
+        this.sessionStartTimestamp = Date.now()
+      }
+      this.sessionStartTimestamp = Date.now()
+      this.sessionEnded = false
+      this.warmupUntilTimestamp = Date.now() + 900
+      this.setKeepScreen(true)
+      this.subscribeAccelerometer('game')
+      this.startHeartRate()
+      this.recordStatusText = '已恢复记录'
+      this.refreshControlText()
+    },
+
+    clearSessionSnapshot () {
+      try {
+        const storage = require('@system.storage')
+        storage.delete({
+          key: 'swing_session_v1'
+        })
+      } catch (err) {}
+    },
+
+    toSettingIndex (value, min, max, fallback) {
+      const num = Math.round(Number(value))
+      if (num < min || num > max || num !== num) {
+        return fallback
+      }
+
+      return num
+    },
+
+    clampHeightCm (value) {
+      const parsed = parseInt(('' + value).replace(/[^0-9]/g, ''), 10)
+      if (parsed !== parsed) {
+        return 175
+      }
+
+      return Math.max(140, Math.min(210, parsed))
+    },
+
+    heightProfileIndex (heightCm) {
+      if (heightCm < 170) {
+        return 0
+      }
+
+      if (heightCm > 180) {
+        return 2
+      }
+
+      return 1
+    },
+
+    heightCmFromIndex (heightIndex) {
+      if (heightIndex === 0) {
+        return 165
+      }
+
+      if (heightIndex === 2) {
+        return 185
+      }
+
+      return 175
+    },
+
+    switchProfile () {
+      this.cycleHeight()
+    },
+
+    simulateSwing () {
+      const nextMode = (this.modeIndex + 1) % 4
+      this.modeIndex = nextMode
+      this.recalculate()
+    },
+
+    startHeartRate () {
+      if (this.heartRateSubscribed || this.heartStartTimerId || this.heartPollTimerId || this.heartServiceFailed) return
+      const vm = this
+      const generation = this.heartGeneration
+      this.heartStatusText = '等待心率启动'
+      this.heartStartTimerId = setTimeout(function () {
+        vm.heartStartTimerId = null
+        if (!vm.running || vm.heartGeneration !== generation) return
+        if (HEART_RATE_MODE === 'subscribe') {
+          vm.startHeartRateSubscription(generation)
+        } else if (HEART_RATE_MODE === 'adaptive') {
+          vm.startHeartRateAdaptive(generation)
+        } else {
+          vm.startHeartRatePolling(generation)
+        }
+      }, HEART_RATE_START_DELAY_MS)
+    },
+
+    getHealthService () {
+      if (this.heartServiceFailed) return null
+      try {
+        return require('@service.health')
+      } catch (err) {
+        this.heartServiceFailed = true
+        this.heartStatusText = '心率服务不可用'
+        return null
+      }
+    },
+
+    readHeartRateOnce () {
+      const health = this.getHealthService()
+      if (!health || typeof health.getHr !== 'function') {
+        this.heartStatusText = '轮询不可用'
+        return false
+      }
+      try {
+        const valid = this.applyHeartRate(health.getHr())
+        this.heartReadFailures = valid ? 0 : this.heartReadFailures + 1
+        return valid
+      } catch (err) {
+        this.heartReadFailures = this.heartReadFailures + 1
+        this.heartStatusText = '等待心率重试'
+        return false
+      }
+    },
+
+    startHeartRatePolling (generation) {
+      if (!this.running || generation !== this.heartGeneration || this.heartPollTimerId || this.heartServiceFailed) return
+      const vm = this
+      this.readHeartRateOnce()
+      this.heartStatusText = '低频心率采样'
+      this.heartPollTimerId = setInterval(function () {
+        if (!vm.running || vm.heartGeneration !== generation) {
+          vm.stopHeartRateTimers()
+          return
+        }
+        vm.readHeartRateOnce()
+      }, HEART_RATE_POLL_INTERVAL_MS)
+    },
+
+    startHeartRateAdaptive (generation) {
+      if (!this.running || generation !== this.heartGeneration || this.heartServiceFailed) return
+      if (this.readHeartRateOnce()) {
+        this.startHeartRatePolling(generation)
+        return
+      }
+      this.heartReadFailures = 0
+      this.startHeartRateSubscription(generation)
+    },
+
+    startHeartRateSubscription (generation) {
+      if (!this.running || generation !== this.heartGeneration || this.heartRateSubscribed || this.heartServiceFailed) return
+      const health = this.getHealthService()
+      if (!health) return
+      const vm = this
+      if (typeof health.getHr === 'function') {
+        try { vm.applyHeartRate(health.getHr()) } catch (err) {}
+      }
+      if (typeof health.subscribeSample !== 'function') {
+        this.startHeartRatePolling(generation)
+        return
+      }
+      try {
+        health.subscribeSample({
+          dataType: 0,
+          callback: function (data) {
+            if (vm.running && vm.heartGeneration === generation) vm.applyHeartRate(data)
+          }
+        })
+        this.heartRateSubscribed = true
+        this.heartStatusText = '等待有效心率'
+      } catch (err) {
+        this.heartRateSubscribed = false
+        this.startHeartRatePolling(generation)
+      }
+    },
+
+    stopHeartRateTimers () {
+      if (this.heartStartTimerId) {
+        try { clearTimeout(this.heartStartTimerId) } catch (err) {}
+        this.heartStartTimerId = null
+      }
+      if (this.heartPollTimerId) {
+        try { clearInterval(this.heartPollTimerId) } catch (err) {}
+        this.heartPollTimerId = null
+      }
+    },
+
+    stopHeartRate () {
+      this.heartGeneration = this.heartGeneration + 1
+      this.stopHeartRateTimers()
+      const wasSubscribed = this.heartRateSubscribed
+      this.heartRateSubscribed = false
+      if (wasSubscribed) {
+        const health = this.getHealthService()
+        try {
+          if (health && typeof health.unsubscribeSample === 'function') {
+            health.unsubscribeSample({ dataType: 0 })
+          }
+        } catch (err) {}
+      }
+      this.heartLastSampleAt = 0
+      this.heartReadFailures = 0
+      if (this.heartRateCount > 0) {
+        this.heartStatusText = '本场采样 ' + this.heartRateCount + ' 次'
+      } else {
+        this.heartStatusText = '本场无有效心率'
+      }
+    },
+
+    applyHeartRate (data) {
+      let value = data
+      if (data && typeof data === 'object') {
+        value = data.heartRate || data.hr || data.value || data.bpm
+      }
+      const bpm = Math.round(Number(value) || 0)
+      if (bpm < 35 || bpm > 230) return false
+      const now = Date.now()
+      this.heartRate = bpm
+      this.heartRateText = '' + bpm
+      if (!this.running) {
+        this.heartStatusText = '实时心率'
+        return true
+      }
+      if (this.heartLastSampleAt > 0 && now - this.heartLastSampleAt < 800) return true
+      this.heartRateSum = this.heartRateSum + bpm
+      this.heartRateCount = this.heartRateCount + 1
+      this.heartRateMax = Math.max(this.heartRateMax, bpm)
+      this.maximumHeartRate = '' + this.heartRateMax
+      this.averageHeartRate = '' + Math.round(this.heartRateSum / this.heartRateCount)
+      if (this.heartLastSampleAt > 0) {
+        const coveredMs = Math.max(0, Math.min(5000, now - this.heartLastSampleAt))
+        this.heartCoveredMs = this.heartCoveredMs + coveredMs
+        this.estimatedCalories = this.estimatedCalories + this.activeCaloriesForInterval(bpm, coveredMs)
+        this.estimatedCaloriesText = this.formatCalories(this.estimatedCalories)
+      }
+      this.heartLastSampleAt = now
+      this.heartStatusText = '训练中实时采样'
+      return true
+    },
+
+    activeCaloriesForInterval (bpm, durationMs) {
+      if (durationMs <= 0) return 0
+      const heightM = Math.max(1.4, Math.min(2.1, Number(this.heightCm) / 100))
+      const estimatedWeightKg = 22 * heightM * heightM
+      const heartReserveRatio = Math.max(0, Math.min(1, (bpm - 65) / 120))
+      const grossMet = 1.5 + 7.5 * heartReserveRatio
+      const activeMet = Math.max(0, grossMet - 1)
+      const activeKcalPerMinute = activeMet * 3.5 * estimatedWeightKg / 200
+      return activeKcalPerMinute * durationMs / 60000
+    },
+
+    startSensor () {
+      this.stopArmedUntil = 0
+      const now = Date.now()
+      this.sessionCreatedTimestamp = now
+      this.sessionStartTimestamp = now
+      this.sessionAccumulatedMs = 0
+      this.sessionEnded = false
+      this.elapsedText = '00:00'
+      this.modeName = '训练中'
+      this.recordStatusText = '稳定基线'
+      this.warmupUntilTimestamp = now + 1800
+      this.setKeepScreen(true)
+      this.saveSessionSnapshot()
+      this.subscribeAccelerometer('game')
+      this.startHeartRate()
+    },
+
+    subscribeAccelerometer (interval) {
+      const vm = this
+      this.statusText = '正在订阅加速度'
+
+      try {
+        const sensor = require('@system.sensor')
+        sensor.subscribeAccelerometer({
+          interval: interval,
+          callback: function (ret) {
+            vm.handleSample(ret)
+          },
+          fail: function (msg, code) {
+            if (interval === 'game') {
+              vm.message = 'game失败, 回退ui'
+              vm.subscribeAccelerometer('ui')
+              return
+            }
+
+            if (interval === 'ui') {
+              vm.handleSensorStartFailure('加速度订阅失败 ' + code)
+            }
+          }
+        })
+        this.running = true
+        this.waveformStatus = '实时加速度'
+        this.waveformEventUntil = 0
+        this.sensorButtonText = '结束本场'
+        this.sessionEnded = false
+        this.statusText = this.handText + ' · ' + this.strapText
+        if (interval === 'game') {
+          this.sensorModeText = 'game 20ms'
+        } else if (interval === 'ui') {
+          this.sensorModeText = 'ui 60ms'
+        }
+        this.recordStatusText = '记录中'
+        this.message = '记录中'
+        this.refreshControlText()
+        this.saveSessionSnapshot()
+      } catch (err) {
+        if (interval === 'game') {
+          this.message = 'game异常, 回退ui'
+          this.subscribeAccelerometer('ui')
+          return
+        }
+
+        if (interval === 'ui') {
+          this.handleSensorStartFailure('加速度订阅异常')
+          return
+        }
+      }
+    },
+
+    handleSensorStartFailure (message) {
+      this.running = false
+      try {
+        const sensor = require('@system.sensor')
+        sensor.unsubscribeAccelerometer()
+      } catch (err) {}
+      this.stopHeartRate()
+      this.setKeepScreen(false)
+      this.sessionStartTimestamp = 0
+      this.warmupUntilTimestamp = 0
+      this.sensorButtonText = '开始'
+      this.statusText = '订阅失败'
+      this.modeName = this.sessionAccumulatedMs > 0 ? '已暂停' : 'BMT Smash'
+      this.recordStatusText = '传感器不可用'
+      this.message = message || '加速度订阅失败'
+      this.refreshControlText()
+      if (this.sessionAccumulatedMs > 0 || this.swingCount > 0) {
+        this.saveSessionSnapshot(false)
+      } else {
+        this.clearSessionSnapshot()
+      }
+      this.showControl()
+    },
+
+    stopSensor () {
+      const now = Date.now()
+      if (!this.running) return
+      this.running = false
+      try {
+        const sensor = require('@system.sensor')
+        sensor.unsubscribeAccelerometer()
+      } catch (err) {
+        this.message = '停止时捕获异常'
+      }
+      this.stopHeartRate()
+
+      if (this.sessionStartTimestamp > 0) {
+        this.sessionAccumulatedMs = this.sessionAccumulatedMs + Math.max(0, now - this.sessionStartTimestamp)
+      }
+      this.sessionStartTimestamp = 0
+      this.sessionEnded = true
+      this.sensorButtonText = '开始'
+      this.statusText = this.handText + ' · ' + this.strapText
+      this.modeName = '本场完成'
+      this.recordStatusText = '已结束'
+      this.hiddenAtTimestamp = 0
+      this.hiddenSampleCount = 0
+      this.message = '已停止, 最高强度 ' + this.bestKmh
+      this.waveformStatus = '训练已结束'
+      this.setKeepScreen(false)
+
+      if (this.swingActive) {
+        this.finishSwing(now)
+      }
+      this.updateElapsed(now)
+      this.refreshControlText()
+      this.saveSessionSnapshot()
+      this.saveSessionHistory()
+      this.showControl()
+    },
+
+    handleSample (ret) {
+      if (!this.running) return
+      const now = Date.now()
+      const x = Number(ret.x) || 0
+      const y = Number(ret.y) || 0
+      const z = Number(ret.z) || 0
+      const rawMagnitude = Math.sqrt(x * x + y * y + z * z)
+      const dtMs = this.lastTimestamp ? Math.max(20, now - this.lastTimestamp) : this.sampleIntervalMs
+      const dt = Math.min(0.08, dtMs / 1000)
+      const gravityAlpha = dt / (0.82 + dt)
+
+      if (!this.gravityReady) {
+        this.gravityX = x
+        this.gravityY = y
+        this.gravityZ = z
+        this.gravityReady = true
+      } else {
+        this.gravityX = this.gravityX * (1 - gravityAlpha) + x * gravityAlpha
+        this.gravityY = this.gravityY * (1 - gravityAlpha) + y * gravityAlpha
+        this.gravityZ = this.gravityZ * (1 - gravityAlpha) + z * gravityAlpha
+      }
+
+      const dynX = x - this.gravityX
+      const dynY = y - this.gravityY
+      const dynZ = z - this.gravityZ
+      const dynMotionAccel = Math.sqrt(dynX * dynX + dynY * dynY + dynZ * dynZ)
+      const rawMotionAccel = Math.max(0, Math.abs(rawMagnitude - GRAVITY))
+      const motionAccel = Math.max(dynMotionAccel, rawMotionAccel * 0.82)
+      const jerkX = dynX - this.lastDynX
+      const jerkY = dynY - this.lastDynY
+      const jerkZ = dynZ - this.lastDynZ
+      const dynJerk = Math.sqrt(jerkX * jerkX + jerkY * jerkY + jerkZ * jerkZ) / dt
+      const rawJerk = Math.abs(rawMagnitude - this.lastMagnitude) / dt
+      const jerk = Math.max(dynJerk, rawJerk * 0.8)
+      this.updateWaveform(now, motionAccel)
+      const energy = motionAccel * motionAccel
+      const smoothedEnergy = this.energyAvg ? this.energyAvg * 0.78 + energy * 0.22 : energy
+      const active = motionAccel > 5.2 || jerk > 86
+      const startBurst = (motionAccel > 8.8 && jerk > 122) || motionAccel > 13.0
+      const sinceLastSwing = now - this.lastSwingTimestamp
+      const strongContinuation = this.lastAcceptedPeakAccel > 0 && motionAccel > this.lastAcceptedPeakAccel * 0.92 && jerk > 130
+      const canStart = sinceLastSwing > 320 || (sinceLastSwing > 230 && strongContinuation)
+
+      this.sampleCount = this.sampleCount + 1
+      this.updateElapsed(now)
+      if (this.running && now - this.lastSessionSaveTimestamp > 15000) {
+        this.saveSessionSnapshot()
+      }
+      if (this.running && this.stopArmedUntil > 0 && now > this.stopArmedUntil) {
+        this.stopArmedUntil = 0
+        this.sensorButtonText = '结束本场'
+        if (this.recordStatusText === '再点一次结束') {
+          this.recordStatusText = '记录中'
+        }
+      }
+      this.sampleIntervalMs = Math.round(this.sampleIntervalMs * 0.8 + dtMs * 0.2)
+      this.energyAvg = smoothedEnergy
+      this.lastMagnitude = rawMagnitude
+      this.lastDynX = dynX
+      this.lastDynY = dynY
+      this.lastDynZ = dynZ
+      this.lastTimestamp = now
+      this.peakMotionAccel = Math.max(this.peakMotionAccel, motionAccel)
+      this.peakJerk = Math.max(this.peakJerk, jerk)
+      this.peakAccelText = this.round1(this.peakMotionAccel)
+      this.recordMediumPeak(now, motionAccel, jerk)
+
+      if (this.running && now < this.warmupUntilTimestamp) {
+        if (this.sampleCount % 8 === 0) {
+          this.modeName = '训练中'
+          this.recordStatusText = '稳定基线'
+          this.message = '先稳定基线'
+        }
+        return
+      }
+
+      if (active && startBurst && canStart && !this.swingActive) {
+        this.beginSwing(now)
+      }
+
+      if (this.swingActive) {
+        this.swingSamples = this.swingSamples + 1
+        if (motionAccel > this.swingPeakAccel) {
+          this.swingPeakAccel = motionAccel
+          this.swingPeakTimestamp = now
+        }
+        this.swingPeakJerk = Math.max(this.swingPeakJerk, jerk)
+        this.swingPeakEnergy = Math.max(this.swingPeakEnergy, smoothedEnergy)
+        if (motionAccel > Math.max(3.2, this.swingPeakAccel * 0.46)) {
+          this.swingHighSamples = this.swingHighSamples + 1
+        }
+        this.swingAccelSum = this.swingAccelSum + motionAccel
+        this.swingAccelSqSum = this.swingAccelSqSum + energy
+        this.swingImpulse = this.swingImpulse + motionAccel * dt
+
+        if (dynX >= 0) {
+          this.swingPosX = this.swingPosX + dynX * dt
+        } else {
+          this.swingNegX = this.swingNegX - dynX * dt
+        }
+
+        if (dynY >= 0) {
+          this.swingPosY = this.swingPosY + dynY * dt
+        } else {
+          this.swingNegY = this.swingNegY - dynY * dt
+        }
+
+        if (dynZ >= 0) {
+          this.swingPosZ = this.swingPosZ + dynZ * dt
+        } else {
+          this.swingNegZ = this.swingNegZ - dynZ * dt
+        }
+
+        if (active) {
+          this.swingLastActiveTimestamp = now
+          this.swingQuietSamples = 0
+        } else {
+          this.swingQuietSamples = this.swingQuietSamples + 1
+        }
+
+        if (now - this.swingStartTimestamp > 640 || this.swingQuietSamples >= 5 || now - this.swingLastActiveTimestamp > 150) {
+          this.finishSwing(now)
+        } else {
+          this.modeName = '捕捉挥拍'
+        }
+      } else if (this.running && this.sampleCount % 4 === 0) {
+        this.modeName = '训练中'
+      }
+    },
+
+    updateWaveform (now, motionAccel) {
+      if (now - this.waveformLastUpdateAt < 80) return
+      this.waveformLastUpdateAt = now
+      const glyphs = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█']
+      const level = Math.max(0, Math.min(7, Math.round((Number(motionAccel) || 0) / 6)))
+      let levels = this.waveformLevels && this.waveformLevels.length
+        ? this.waveformLevels.slice(0)
+        : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      levels.shift()
+      levels.push(level)
+      this.waveformLevels = levels
+      let text = ''
+      for (let index = 0; index < levels.length; index = index + 1) {
+        text = text + glyphs[levels[index]]
+      }
+      this.waveformText = text
+      if (this.waveformEventUntil > 0 && now > this.waveformEventUntil) {
+        this.waveformEventUntil = 0
+        this.waveformStatus = '实时加速度'
+      }
+    },
+
+    updateElapsed (now) {
+      if (this.sessionStartTimestamp <= 0) {
+        this.elapsedText = '00:00'
+        if (this.sessionAccumulatedMs > 0) {
+          const pausedSeconds = Math.max(0, Math.floor(this.sessionAccumulatedMs / 1000))
+          const pausedMinutes = Math.floor(pausedSeconds / 60)
+          const pausedRemain = pausedSeconds % 60
+          const pausedMinText = pausedMinutes < 10 ? '0' + pausedMinutes : '' + pausedMinutes
+          const pausedSecText = pausedRemain < 10 ? '0' + pausedRemain : '' + pausedRemain
+          this.elapsedText = pausedMinText + ':' + pausedSecText
+        }
+        return
+      }
+
+      const activeMs = this.sessionAccumulatedMs + Math.max(0, now - this.sessionStartTimestamp)
+      const seconds = Math.max(0, Math.floor(activeMs / 1000))
+      const minutes = Math.floor(seconds / 60)
+      const remain = seconds % 60
+      const minText = minutes < 10 ? '0' + minutes : '' + minutes
+      const secText = remain < 10 ? '0' + remain : '' + remain
+      this.elapsedText = minText + ':' + secText
+    },
+
+    beginSwing (now) {
+      this.swingActive = true
+      this.swingStartTimestamp = now
+      this.swingLastActiveTimestamp = now
+      this.swingPeakTimestamp = now
+      this.swingPeakAccel = 0
+      this.swingPeakJerk = 0
+      this.swingPeakEnergy = 0
+      this.swingSamples = 0
+      this.swingHighSamples = 0
+      this.swingQuietSamples = 0
+      this.swingAccelSum = 0
+      this.swingAccelSqSum = 0
+      this.swingImpulse = 0
+      this.swingPosX = 0
+      this.swingNegX = 0
+      this.swingPosY = 0
+      this.swingNegY = 0
+      this.swingPosZ = 0
+      this.swingNegZ = 0
+      this.modeName = '捕捉挥拍'
+    },
+
+    recordMediumPeak (now, motionAccel, jerk) {
+      if (motionAccel > 6.4 && jerk > 48 && !this.mediumPeakLocked) {
+        this.recentPeakTime1 = this.recentPeakTime2
+        this.recentPeakTime2 = this.recentPeakTime3
+        this.recentPeakTime3 = now
+        this.recentPeakAccel1 = this.recentPeakAccel2
+        this.recentPeakAccel2 = this.recentPeakAccel3
+        this.recentPeakAccel3 = motionAccel
+        this.mediumPeakLocked = true
+      } else if (motionAccel < 3.2) {
+        this.mediumPeakLocked = false
+      }
+    },
+
+    isRunningLikeMotion () {
+      if (this.recentPeakTime1 <= 0 || this.recentPeakTime2 <= 0 || this.recentPeakTime3 <= 0) {
+        return false
+      }
+
+      const interval1 = this.recentPeakTime2 - this.recentPeakTime1
+      const interval2 = this.recentPeakTime3 - this.recentPeakTime2
+      const avgInterval = (interval1 + interval2) / 2
+      const intervalSpread = Math.abs(interval1 - interval2) / Math.max(1, avgInterval)
+      const accelAvg = (this.recentPeakAccel1 + this.recentPeakAccel2 + this.recentPeakAccel3) / 3
+      const accelSpread = Math.max(
+        Math.abs(this.recentPeakAccel1 - accelAvg),
+        Math.abs(this.recentPeakAccel2 - accelAvg),
+        Math.abs(this.recentPeakAccel3 - accelAvg)
+      ) / Math.max(1, accelAvg)
+
+      return interval1 >= 260 && interval1 <= 760 &&
+        interval2 >= 260 && interval2 <= 760 &&
+        intervalSpread < 0.24 &&
+        accelSpread < 0.45
+    },
+
+    scoreSwingQuality (metrics) {
+      return evaluateSwingQuality({
+        ...metrics,
+        runningLike: this.isRunningLikeMotion()
+      })
+    },
+
+    finishSwing (now) {
+      const durationMs = Math.max(60, now - this.swingStartTimestamp)
+      const avgAccel = this.swingSamples > 0 ? this.swingAccelSum / this.swingSamples : 0
+      const energyIntegral = this.swingAccelSqSum * Math.min(0.08, this.sampleIntervalMs / 1000)
+      const burstRatio = this.swingPeakAccel / Math.max(1.2, avgAccel)
+      const dominantImpulse = Math.max(this.swingPosX, this.swingNegX, this.swingPosY, this.swingNegY, this.swingPosZ, this.swingNegZ)
+      const directionRatio = dominantImpulse / Math.max(0.1, this.swingImpulse)
+      const peakLatencyMs = Math.max(0, this.swingPeakTimestamp - this.swingStartTimestamp)
+      const halfWidthMs = this.swingHighSamples * this.sampleIntervalMs
+      const quality = this.scoreSwingQuality({
+        peakAccel: this.swingPeakAccel,
+        peakJerk: this.swingPeakJerk,
+        energyIntegral: energyIntegral,
+        burstRatio: burstRatio,
+        directionRatio: directionRatio,
+        impulse: this.swingImpulse,
+        durationMs: durationMs,
+        peakLatencyMs: peakLatencyMs,
+        halfWidthMs: halfWidthMs,
+        intervalMs: this.sampleIntervalMs,
+        samples: this.swingSamples
+      })
+
+      this.swingActive = false
+
+      if (!quality.accepted) {
+        this.modeName = this.running ? '训练中' : 'BMT Smash'
+        this.message = '忽略' + quality.reason + ', 峰值 ' + this.round1(this.swingPeakAccel)
+        return
+      }
+
+      const estimate = this.estimateSwingMetrics({
+        peakAccel: this.swingPeakAccel,
+        peakJerk: this.swingPeakJerk,
+        peakEnergy: this.swingPeakEnergy,
+        avgAccel: avgAccel,
+        impulse: this.swingImpulse,
+        dominantImpulse: dominantImpulse,
+        directionRatio: directionRatio,
+        burstRatio: burstRatio,
+        energyIntegral: energyIntegral,
+        durationMs: durationMs,
+        intervalMs: this.sampleIntervalMs,
+        qualityScore: quality.score
+      })
+
+      if (this.isRecoveryReturn(now, estimate, dominantImpulse)) {
+        this.modeName = this.running ? '训练中' : 'BMT Smash'
+        this.message = '忽略回位, 峰值 ' + this.round1(this.swingPeakAccel)
+        return
+      }
+
+      this.swingCount = this.swingCount + 1
+      this.updateElapsed(now)
+      this.lastSwingTimestamp = now
+      this.lastAcceptedPeakAccel = this.swingPeakAccel
+      this.lastAcceptedImpulse = Math.max(this.swingImpulse, dominantImpulse)
+      this.lastAcceptedSpeedKmh = estimate.racketSpeedKmh
+      const intensityIndex = this.estimateSwingIntensityIndex(estimate, {
+        qualityScore: quality.score,
+        directionRatio: directionRatio,
+        durationMs: durationMs
+      })
+      this.modeName = '本次指数'
+      this.speedKmh = intensityIndex
+      this.shuttleKmh = estimate.shuttleSpeedKmh
+      this.waveformStatus = '有效挥拍 · ' + intensityIndex
+      this.waveformEventUntil = now + 1400
+      this.intensitySum = this.intensitySum + intensityIndex
+      this.confidence = estimate.confidence
+      this.leverText = estimate.leverRatio
+
+      if (quality.bestEligible && intensityIndex > this.bestKmh) {
+        this.bestKmh = intensityIndex
+        this.bestName = '本场'
+      }
+
+      this.recordStatusText = '记录中'
+      this.message = '已记录'
+      this.saveSessionSnapshot()
+    },
+
+    isRecoveryReturn (now, estimate, dominantImpulse) {
+      return evaluateRecoveryReturn({
+        at: now,
+        peakAccel: this.swingPeakAccel,
+        impulse: Math.max(this.swingImpulse, dominantImpulse),
+        racketSpeedKmh: estimate.racketSpeedKmh
+      }, {
+        at: this.lastSwingTimestamp,
+        peakAccel: this.lastAcceptedPeakAccel,
+        impulse: this.lastAcceptedImpulse,
+        racketSpeedKmh: this.lastAcceptedSpeedKmh
+      })
+    },
+
+    resetSession () {
+      if (this.running) {
+        this.message = '采样中已锁定, 先停止'
+        return
+      }
+
+      this.speedKmh = 0
+      this.shuttleKmh = 0
+      this.intensitySum = 0
+      this.bestKmh = 0
+      this.bestName = '无'
+      this.swingCount = 0
+      this.sampleCount = 0
+      this.peakMotionAccel = 0
+      this.peakJerk = 0
+      this.peakAccelText = '0.0'
+      this.energyAvg = 0
+      this.heartRate = 0
+      this.heartRateText = '--'
+      this.averageHeartRate = '--'
+      this.maximumHeartRate = '--'
+      this.heartRateSum = 0
+      this.heartRateCount = 0
+      this.heartRateMax = 0
+      this.heartLastSampleAt = 0
+      this.heartCoveredMs = 0
+      this.estimatedCalories = 0
+      this.estimatedCaloriesText = '0.0'
+      this.heartStatusText = '等待训练开始'
+      if (this.sensorModeText.indexOf('game') >= 0) {
+        this.sampleIntervalMs = 20
+      } else if (this.sensorModeText.indexOf('ui') >= 0) {
+        this.sampleIntervalMs = 60
+      } else {
+        this.sampleIntervalMs = 200
+      }
+      this.lastMagnitude = 0
+      this.lastTimestamp = 0
+      this.gravityReady = false
+      this.gravityX = 0
+      this.gravityY = 0
+      this.gravityZ = GRAVITY
+      this.lastDynX = 0
+      this.lastDynY = 0
+      this.lastDynZ = 0
+      this.lastSwingTimestamp = -1000000
+      this.lastAcceptedPeakAccel = 0
+      this.lastAcceptedImpulse = 0
+      this.lastAcceptedSpeedKmh = 0
+      this.sessionStartTimestamp = 0
+      this.sessionCreatedTimestamp = 0
+      this.sessionAccumulatedMs = 0
+      this.sessionEnded = false
+      this.hiddenAtTimestamp = 0
+      this.hiddenSampleCount = 0
+      this.lastSessionSaveTimestamp = 0
+      this.lastHistorySaveKey = ''
+      this.elapsedText = '00:00'
+      this.recordStatusText = '准备开始'
+      this.warmupUntilTimestamp = 0
+      this.recentPeakTime1 = 0
+      this.recentPeakTime2 = 0
+      this.recentPeakTime3 = 0
+      this.recentPeakAccel1 = 0
+      this.recentPeakAccel2 = 0
+      this.recentPeakAccel3 = 0
+      this.mediumPeakLocked = false
+      this.swingActive = false
+      this.swingStartTimestamp = 0
+      this.swingLastActiveTimestamp = 0
+      this.swingPeakTimestamp = 0
+      this.swingPeakAccel = 0
+      this.swingPeakJerk = 0
+      this.swingPeakEnergy = 0
+      this.swingSamples = 0
+      this.swingHighSamples = 0
+      this.swingQuietSamples = 0
+      this.swingAccelSum = 0
+      this.swingAccelSqSum = 0
+      this.swingImpulse = 0
+      this.swingPosX = 0
+      this.swingNegX = 0
+      this.swingPosY = 0
+      this.swingNegY = 0
+      this.swingPosZ = 0
+      this.swingNegZ = 0
+      this.waveformText = '▁▁▁▁▁▁▁▁▁▁▁▁'
+      this.waveformStatus = '实时加速度'
+      this.waveformLevels = []
+      this.waveformLastUpdateAt = 0
+      this.waveformEventUntil = 0
+      this.homeScore = 0
+      this.awayScore = 0
+      this.scoreStatusText = '本局'
+      this.updateServeSide('')
+      this.modeName = this.running ? '训练中' : 'BMT Smash'
+      this.refreshControlText()
+      this.message = '本次训练已重置'
+      this.clearSessionSnapshot()
+    },
+
+    recalculate () {
+      let name = '轻量热身'
+      let accel = 16
+      let jerk = 140
+
+      if (this.modeIndex === 1) {
+        name = '平抽快挡'
+        accel = 32
+        jerk = 260
+      } else if (this.modeIndex === 2) {
+        name = '后场高远'
+        accel = 58
+        jerk = 360
+      } else if (this.modeIndex === 3) {
+        name = '杀球发力'
+        accel = 108
+        jerk = 520
+      }
+
+      const geometry = this.geometry()
+      const profileName = this.profileName() + ' / ' + this.handText + ' / ' + this.strapText
+      const leverRatio = (geometry.pivotToWatch + geometry.watchToRacket) / geometry.pivotToWatch
+      const wristSpeed = Math.sqrt(accel * geometry.pivotToWatch)
+      const snapGain = 1 + Math.min(0.46, Math.max(0, (jerk - 80) / 620))
+      const distalGain = 1 + Math.min(0.36, Math.max(0, (accel - 28) / 180))
+      const racketMps = wristSpeed * leverRatio * snapGain * distalGain * geometry.strapSpeedFactor
+      const racketKmh = this.clampKmh(Math.round(racketMps * 3.6), MAX_RACKET_SPEED_KMH)
+      const demoQuality = this.modeIndex === 3 ? 0.76 : (this.modeIndex === 2 ? 0.68 : (this.modeIndex === 1 ? 0.62 : 0.54))
+      const demoCap = this.modeIndex === 3 ? 320 : (this.modeIndex === 2 ? 285 : 235)
+      const shuttleKmh = this.estimateShuttleKmh(racketKmh / MS_TO_KMH, demoQuality, demoCap)
+      const confidence = Math.round(Math.min(68, 22 + accel * 0.45 + jerk * 0.04))
+      const intensityIndex = this.estimateSwingIntensityIndex({
+        racketSpeedKmh: racketKmh,
+        confidence: confidence
+      }, {
+        qualityScore: demoQuality,
+        directionRatio: this.modeIndex === 3 ? 0.42 : (this.modeIndex === 2 ? 0.34 : 0.27),
+        durationMs: this.modeIndex === 3 ? 280 : (this.modeIndex === 2 ? 360 : 430)
+      })
+      let bestKmh = this.clampKmh(this.bestKmh, MAX_INTENSITY_INDEX)
+      let bestName = this.bestName
+
+      if (intensityIndex > bestKmh) {
+        bestKmh = intensityIndex
+        bestName = name
+      }
+
+      this.modeName = name
+      this.statusText = profileName
+      this.speedKmh = intensityIndex
+      this.shuttleKmh = shuttleKmh
+      this.leverText = '' + Math.round(leverRatio * 100) / 100
+      this.bestKmh = bestKmh
+      this.bestName = bestName
+      this.confidence = confidence
+      this.message = '最高强度 ' + bestKmh + ', 杠杆比 ' + this.leverText
+    },
+
+    estimateSwingIntensityIndex (estimate, metrics) {
+      return calculateSwingIntensityIndex(estimate, metrics)
+    },
+
+    estimateSwingMetrics (metrics) {
+      return calculateSwingMetrics(metrics, this.geometry())
+    },
+
+    estimateRestitution (racketMps) {
+      return calculateRestitution(racketMps)
+    },
+
+    estimateSignalSpeedCeiling (qualityScore, directionRatio, durationMs, peakJerk, recoveredAccel) {
+      return calculateSignalSpeedCeiling(
+        qualityScore,
+        directionRatio,
+        durationMs,
+        peakJerk,
+        recoveredAccel
+      )
+    },
+
+    estimateShuttleSpeedCeiling (qualityScore, directionRatio, durationMs, peakJerk, recoveredAccel, racketKmh) {
+      return calculateShuttleSpeedCeiling(
+        qualityScore,
+        directionRatio,
+        durationMs,
+        peakJerk,
+        recoveredAccel,
+        racketKmh
+      )
+    },
+
+    estimateShuttleKmh (racketMps, qualityScore, maxCap) {
+      return calculateShuttleKmh(racketMps, qualityScore, maxCap)
+    },
+
+    clampKmh (value, maxKmh) {
+      const parsed = Math.round(Number(value) || 0)
+      return Math.max(0, Math.min(maxKmh, parsed))
+    },
+
+    geometry () {
+      return createPlayerGeometry({
+        heightCm: this.clampHeightCm(this.heightCm),
+        strapIndex: this.strapIndex
+      })
+    },
+
+    profileName () {
+      if (this.profileIndex === 0) {
+        return '短臂 / 控制握拍'
+      }
+
+      if (this.profileIndex === 2) {
+        return '长臂 / 杀球握拍'
+      }
+
+      return '中等臂长 / 标准握拍'
+    },
+
+    round1 (value) {
+      return '' + Math.round(value * 10) / 10
+    },
+
+    formatCalories (value) {
+      const calories = Math.max(0, Number(value) || 0)
+      return calories >= 1000 ? '' + Math.round(calories) : this.round1(calories)
+    },
+
+    round2 (value) {
+      return '' + Math.round(value * 100) / 100
+    },
+
+    clamp01 (value) {
+      return Math.max(0, Math.min(1, Number(value) || 0))
+    }
+  }
+</script>
