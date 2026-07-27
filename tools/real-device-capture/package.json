@@ -1,0 +1,17 @@
+{
+  "name": "bmt-smash-real-device-capture",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Isolated real-device evidence capture app for BMT Smash.",
+  "scripts": {
+    "build": "aiot build --enable-jsc",
+    "check": "node tools/check-capture.mjs",
+    "test": "node --test test/*.test.mjs",
+    "merge": "node tools/merge-capture.mjs"
+  },
+  "devDependencies": {
+    "@aiot-toolkit/jsc": "^1.0.3",
+    "aiot-toolkit": "^2.0.5"
+  }
+}

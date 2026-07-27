@@ -58,7 +58,8 @@ const forbiddenExtensions = new Set(['.apk', '.rpk', '.abp', '.keystore', '.pem'
 function walk (dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (entry.name === '.git' || entry.name === 'node_modules' ||
-        entry.name === 'build' || entry.name === 'dist') continue
+        entry.name === 'build' || entry.name === 'dist' ||
+        entry.name === 'target' || entry.name === 'out') continue
     const full = path.join(dir, entry.name)
     if (entry.isDirectory()) {
       walk(full)

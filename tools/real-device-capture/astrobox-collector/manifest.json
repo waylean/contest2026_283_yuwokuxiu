@@ -1,0 +1,13 @@
+{
+  "name": "BMT Capture Collector",
+  "icon": "icon.png",
+  "version": "0.1.0",
+  "description": "接收 BMT Smash 诊断 RPK 的 interconnect 导出分片，重组后写入 stdout",
+  "author": "waylean",
+  "website": "",
+  "entry": "bmt_capture_collector.wasm",
+  "wasi_version": 2,
+  "api_level": 3,
+  "permissions": ["device", "register_interconnect_recv"],
+  "additional_files": []
+}

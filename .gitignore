@@ -3,6 +3,13 @@ quickapp/bmt_smash/node_modules/
 quickapp/bmt_smash/build/
 quickapp/bmt_smash/dist/
 quickapp/bmt_smash/sign/
+tools/real-device-capture/node_modules
+tools/real-device-capture/build/
+tools/real-device-capture/dist/
+tools/real-device-capture/sign/
+tools/real-device-capture/out/
+tools/real-device-capture/astrobox-collector/target/
+tools/real-device-capture/astrobox-collector/dist/
 *.rpk
 *.apk
 *.abp
