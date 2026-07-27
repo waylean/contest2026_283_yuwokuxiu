@@ -11,6 +11,7 @@ const required = [
   'README.md',
   'docs/contest-compliance.md',
   'docs/ai-native-development-log.md',
+  'docs/ai-log-privacy-audit.md',
   'docs/official-requirements-2026.md',
   'docs/judging-readiness.md',
   'docs/phase-3-plan.md',

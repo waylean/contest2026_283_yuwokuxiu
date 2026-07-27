@@ -77,6 +77,7 @@ npm run emulator:capture
 AI 协作覆盖需求整理、代码重构、算法测试、模拟器调试、双智能体盲审和赛事
 材料整理。可复用流程沉淀在 `skills/openvela-wearable-swing/`，结构化摘要在
 `docs/ai-native-development-log.md`。官方格式对话由赛事采集器写入 `logs/`。
+历史会话的完整性与隐私处理见 `docs/ai-log-privacy-audit.md`。
 
 ## 当前证据
 

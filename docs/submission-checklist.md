@@ -4,14 +4,16 @@
 
 - [x] Organizer repository `contest2026_283_yuwokuxiu` received
 - [x] GitHub collaborator invitation accepted with the registered account
-- [ ] openvela CLA signed
+- [x] openvela CLA signed and `cla/signature` status passed
 - [x] Target branch is `dev-ai-contest-2026`
 - [x] Apache 2.0 license visible at repository root
 - [x] Third-party notices reviewed
 - [x] Competition branch pushed to the participant fork
 - [x] Draft pull request opened as official repository PR #1
 - [ ] Pull request self-review and merge completed
-- [ ] Official AI Coding collector verified in the openvela `.repo` workspace
+- [x] Official AI Coding collector verified in the openvela `.repo` workspace
+- [x] Historical desktop sessions audited and excluded without editing
+- [x] Collector-time sensitive-data redaction tested with synthetic values
 - [ ] Reviewed competition conversations present under `logs/<github-login>/`
 - [x] Source builds from a clean remote checkout
 - [x] No binary, key, user data, or local path leakage
