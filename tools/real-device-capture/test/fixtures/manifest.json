@@ -1,0 +1,58 @@
+{
+  "formatVersion": "bmt-capture-v1",
+  "captureApp": {
+    "package": "com.waylean.bmtsmash.capture",
+    "version": "0.1.0",
+    "sensor": "system.sensor accelerometer",
+    "requestedInterval": "game",
+    "nominalIntervalMs": 20,
+    "preWindowMs": 1000,
+    "postWindowMs": 1000
+  },
+  "privacy": {
+    "anonymousSession": true,
+    "collected": [
+      "accelerometer",
+      "stage-labels",
+      "timestamps",
+      "algorithm-features"
+    ],
+    "excluded": [
+      "name",
+      "location",
+      "device-key",
+      "video",
+      "account"
+    ]
+  },
+  "session": {
+    "id": "cap-fixture-anonymous",
+    "startedAt": 1000000,
+    "endedAt": 1003000,
+    "active": false,
+    "exportedAt": 1004000
+  },
+  "currentStageIndex": 4,
+  "stages": [
+    {
+      "index": 4,
+      "name": "overhead-shadow",
+      "expectedCount": 1,
+      "startedAt": 1000100,
+      "endedAt": 1002900,
+      "eventCount": 1
+    }
+  ],
+  "chunks": [
+    {
+      "index": 0,
+      "key": "bmt_capture_chunk_cap-fixture-anonymous_0",
+      "eventCount": 1,
+      "checksum": "00e0a165",
+      "serializedLength": 953
+    }
+  ],
+  "pendingEventCount": 0,
+  "nextSampleSeq": 6,
+  "savedAt": 1004000
+}

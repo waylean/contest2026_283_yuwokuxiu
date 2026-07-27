@@ -1,0 +1,12 @@
+[package]
+name = "bmt-capture-collector"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+astrobox-ng-wit = "0.3.1"
+tracing = "0.1"
+tracing-subscriber = "0.3"

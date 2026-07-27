@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "team_id": "contest2026_283_yuwokuxiu",
+  "github_login": "waylean",
+  "generator": "claude-code-collector@1.2.0",
+  "updated_at": "2026-07-27T10:22:35.240Z",
+  "sessions": [
+    {
+      "session_id": "e0fd04f2-a8ee-4cb0-a8c4-55b6ed3436ed",
+      "tool": "claude-code",
+      "started_at": "2026-07-27T10:09:39.188Z",
+      "last_event_at": "2026-07-27T10:22:35.239Z",
+      "event_count": 130,
+      "raw_event_count": 147,
+      "file_path": "logs/waylean/2026-07-27/claude-code__e0fd04f2-a8ee-4cb0-a8c4-55b6ed3436ed.jsonl",
+      "collection_mode": "cli",
+      "health": "ok",
+      "model": "mimo-v2.5-pro"
+    }
+  ]
+}
