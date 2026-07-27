@@ -1,0 +1,13 @@
+{
+  "name": "contest2026-283-yuwokuxiu",
+  "version": "0.1.0",
+  "private": true,
+  "description": "BMT Smash openvela competition workspace.",
+  "scripts": {
+    "install:quickapp": "npm --prefix quickapp/bmt_smash ci",
+    "check": "npm --prefix quickapp/bmt_smash run contest:check && node skills/openvela-wearable-swing/scripts/audit-project.mjs .",
+    "replay": "npm --prefix quickapp/bmt_smash run replay:check",
+    "build": "npm --prefix quickapp/bmt_smash run build",
+    "emulator:capture": "npm --prefix quickapp/bmt_smash run emulator:capture"
+  }
+}

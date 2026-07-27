@@ -1,0 +1,13 @@
+BMT Smash openvela Contest Edition
+Copyright 2026 waylean
+
+This repository is a competition-specific, standalone wearable edition derived
+from the author's BMT Smash product. It does not include Android companion code,
+commercial release packages, signing credentials, device AuthKeys, private user
+records, or third-party installation tooling.
+
+The BMT Smash source code and included application icon in this repository are
+provided under the Apache License 2.0 for the competition edition.
+
+The project uses the Xiaomi Vela/openvela Quick App toolchain. Toolchain and
+platform components retain their respective upstream licenses.

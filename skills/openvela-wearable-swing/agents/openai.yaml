@@ -1,0 +1,7 @@
+interface:
+  display_name: "openvela Wearable Swing"
+  short_description: "Audit and validate standalone wearable motion apps"
+  default_prompt: "Use $openvela-wearable-swing to audit this standalone wearable sensor application."
+
+policy:
+  allow_implicit_invocation: true

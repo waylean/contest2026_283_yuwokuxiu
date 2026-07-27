@@ -1,0 +1,23 @@
+{
+  "name": "bmt-smash-openvela-contest-wearable",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Standalone BMT Smash competition edition for Xiaomi Smart Band 10 Pro and openvela.",
+  "scripts": {
+    "start": "node tools/sync-algorithm-runtime.mjs && aiot start --watch --enable-jsc",
+    "build": "node tools/sync-algorithm-runtime.mjs && node tools/build-contest.mjs",
+    "release": "node tools/sync-algorithm-runtime.mjs && aiot release --enable-jsc",
+    "check": "node tools/check-contest-project.mjs && node tools/validate-algorithm.mjs",
+    "contest:check": "npm run check && node tools/check-contest-package.mjs",
+    "replay:check": "node tools/replay-sensor-fixture.mjs",
+    "validate:algorithm": "node tools/validate-algorithm.mjs",
+    "emulator:capture": "node tools/capture-contest-emulator.mjs"
+  },
+  "devDependencies": {
+    "@aiot-toolkit/emulator": "^2.0.5",
+    "@aiot-toolkit/jsc": "^1.0.3",
+    "aiot-toolkit": "^2.0.5",
+    "pngjs": "^5.0.0"
+  }
+}
