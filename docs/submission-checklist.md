@@ -8,31 +8,35 @@
 - [x] Target branch is `dev-ai-contest-2026`
 - [x] Apache 2.0 license visible at repository root
 - [x] Third-party notices reviewed
-- [ ] Fork, pull request and self-review flow completed
+- [x] Competition branch pushed to the participant fork
+- [ ] Draft pull request, self-review and merge completed
 - [ ] Official AI Coding collector verified in the openvela `.repo` workspace
 - [ ] Reviewed competition conversations present under `logs/<github-login>/`
-- [ ] Source builds from a clean checkout
+- [x] Source builds from a clean remote checkout
 - [x] No binary, key, user data, or local path leakage
 
 ## Introduction document
 
-- [ ] Product audience, scenario, pain point and evidence
-- [ ] openvela APIs and graphics capability
-- [ ] Technical optimization and capability extension
-- [ ] AI Coding ratio and methodology
-- [ ] MCP, Skills and token-usage record
-- [ ] Architecture and test results
-- [ ] Improvement suggestions for openvela
-- [ ] Repository and branch URL
+- [x] Structured introduction draft created
+- [x] Product audience, scenario and pain point drafted
+- [x] openvela APIs and graphics capability drafted
+- [x] Technical optimization and capability extension drafted
+- [x] AI Coding methodology, Skills and token policy drafted
+- [x] Architecture and current test results drafted
+- [x] Improvement suggestions for openvela drafted
+- [x] Repository and branch URL included
+- [ ] Real-device and product evidence inserted
+- [ ] Final PDF or PPTX exported and visually reviewed
 
 ## Demo, maximum five minutes
 
-- [ ] Problem and product in 30 seconds
-- [ ] Start, detect swings, pause and finish
-- [ ] Metrics, heart-rate fallback, history and scoring
-- [ ] openvela emulator build and run
-- [ ] Xiaomi Smart Band 10 Pro real-device evidence
-- [ ] Architecture, AI workflow and open-source contribution
+- [x] Under-five-minute script and fallback path prepared
+- [ ] Problem and product recorded in 30 seconds
+- [ ] Start, detect swings, pause and finish recorded
+- [ ] Metrics, heart-rate fallback, history and scoring recorded
+- [ ] openvela emulator build and run recorded
+- [ ] Xiaomi Smart Band 10 Pro real-device evidence recorded
+- [ ] Architecture, AI workflow and open-source contribution recorded
 
 ## Evidence
 
