@@ -1,5 +1,10 @@
 # AI-Native Development Log
 
+This file is a human-reviewed development index. It does not replace the
+official machine-generated logs required under `logs/<github-login>/`. The
+privacy and exclusion decision for historical desktop sessions is documented
+in `docs/ai-log-privacy-audit.md`.
+
 ## Recording policy
 
 Each entry records the objective, AI tools, Skills or MCP tools, changed files,
@@ -132,5 +137,30 @@ Do not estimate or invent token usage.
 - Verification: the materials cover the mandatory openvela capability,
   technical optimization, AI-Native workflow, product scenario, repository and
   improvement-suggestion sections. Final PDF/PPTX and Demo remain pending.
+- Token usage: not exposed by the current development tool; recorded as
+  unavailable rather than estimated.
+
+## 2026-07-27 - Official collector and privacy baseline
+
+- Objective: organize historical AI Coding evidence without leaking device
+  credentials, personal information or unrelated commercial-project context.
+- AI tool: OpenAI Codex with official openvela documentation and collector
+  source inspection.
+- Findings: the two existing Codex Desktop sessions total 768 MiB and span
+  multiple projects. They contain sensitive information categories and use a
+  `response_item.payload` transcript envelope that the official collector
+  `1.2.0` parser does not currently replay completely.
+- Decision: exclude both historical sessions as whole sessions. No transcript
+  was manually edited, converted into synthetic official JSONL or committed.
+- Changes: established a minimal official `.repo` workspace, installed the
+  official collector, added collector-time custom redaction, and documented
+  the review and future submission procedure.
+- Verification: collector installation passed all 11 setup checks. A synthetic
+  two-event fixture triggered seven expected redactions and retained none of
+  the fake sensitive values.
+- CLA: the `cla/signature` status for official pull request #1 passed after the
+  participant signed the openvela CLA.
+- Remaining boundary: clean contest-only sessions must still be captured from
+  the official workspace and validated before any `logs/` content is submitted.
 - Token usage: not exposed by the current development tool; recorded as
   unavailable rather than estimated.
