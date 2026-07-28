@@ -21,8 +21,8 @@
 - [x] Complete deterministic accelerometer property and adversarial-input checks
 - [x] Document algorithm limits and avoid unsupported accuracy claims
 - [ ] Complete emulator lifecycle and long-session stability evidence
-- [ ] Record a Demo video no longer than five minutes
-- [ ] Produce the final introduction document
+- [x] Record a Demo video no longer than five minutes
+- [x] Produce the final introduction document
 
 ## Core-capability evidence
 
