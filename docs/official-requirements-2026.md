@@ -64,10 +64,10 @@ the accelerometer, optional health service, storage, brightness and router
 capabilities.
 
 For the initial round, the official watch guide allows emulator verification
-and sensor Mock data. Real hardware becomes especially valuable as evidence
-and can be requested for the final round. This project already owns and tests
-on a Xiaomi Smart Band 10 Pro, so real-device evidence should be included in
-the initial submission rather than deferred.
+and sensor Mock data. This submission therefore uses reproducible emulator and
+algorithm evidence for acceptance. Real-device product footage may illustrate
+the interaction, but it is not presented as detector-accuracy evidence unless
+a future labeled field protocol is completed.
 
 ## Scoring
 

@@ -164,3 +164,30 @@ Do not estimate or invent token usage.
   the official workspace and validated before any `logs/` content is submitted.
 - Token usage: not exposed by the current development tool; recorded as
   unavailable rather than estimated.
+
+## 2026-07-28 - Accelerometer-first evidence and algorithm hardening
+
+- Objective: remove the non-standard diagnostic-export route from the contest
+  mainline and strengthen evidence that can be reproduced from the openvela
+  standalone application source.
+- AI tools: OpenAI Codex for implementation and two official-collector Claude
+  Code sessions for independent read-only review.
+- Human decision: non-field gestures and AstroBox extraction do not establish
+  badminton accuracy. The diagnostic implementation was removed, while its
+  historical AI log remains as a truthful record of an abandoned approach.
+- Algorithm changes: bounded idle-noise thresholds, narrow-impact rejection,
+  signed three-axis impulse direction and conservative direction-aware recovery
+  filtering.
+- Evidence changes: added axis/sign invariance, amplitude monotonicity,
+  callback-interval tolerance and isolated-impact properties; updated contest
+  documents to distinguish deterministic properties from field accuracy.
+- Review result: the independent review identified stale real-device and CLA
+  checklist wording. Those claims were corrected, and recovery filtering was
+  narrowed to avoid rejecting a weaker same-direction rally swing solely by
+  amplitude.
+- Verification: root package audit, deterministic replay, property checks,
+  JSC-only build, `git diff --check`, privacy scan and official collector
+  validation passed. The collector validated three complete sessions with 290
+  events.
+- Token usage: retained in the official collector records when provided by the
+  tool; no estimate was fabricated.

@@ -13,12 +13,14 @@
 - [x] Official repository and pull-request process documented
 - [x] Receive organizer-created `contest2026_283_yuwokuxiu` repository
 - [x] Accept GitHub collaborator invitation with the registered account
-- [ ] Sign CLA and merge the team pull request
-- [ ] Collect reviewed AI Coding sessions under `logs/<github-login>/`
+- [x] Sign CLA and pass the official `cla/signature` check
+- [ ] Merge the team pull request
+- [x] Collect and validate an official AI Coding session under `logs/<github-login>/`
 - [x] Build and capture the application in the openvela wearable emulator
 - [x] Add visible real-time acceleration graphics
-- [ ] Complete labeled real-device detector-quality report
-- [ ] Complete performance, stability, and 60-minute session report
+- [x] Complete deterministic accelerometer property and adversarial-input checks
+- [x] Document algorithm limits and avoid unsupported accuracy claims
+- [ ] Complete emulator lifecycle and long-session stability evidence
 - [ ] Record a Demo video no longer than five minutes
 - [ ] Produce the final introduction document
 
