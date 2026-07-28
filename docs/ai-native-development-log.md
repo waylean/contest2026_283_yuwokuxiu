@@ -191,3 +191,20 @@ Do not estimate or invent token usage.
   events.
 - Token usage: retained in the official collector records when provided by the
   tool; no estimate was fabricated.
+
+## 2026-07-28 - Final submission assembly
+
+- Objective: prepare the official Chinese-named package with a judge-facing
+  introduction, sanitized source tree, two-minute Demo and reproducible
+  evidence.
+- AI tools: OpenAI Codex, K3 frontend-design delegation and HyperFrames.
+- AI Coding ratio: approximately 90% of competition-edition code and document
+  drafting was AI-assisted; the participant retained all requirements,
+  product decisions, device experience, claim boundaries and final acceptance.
+  This is a development-effort estimate, not line-by-line authorship.
+- Official collector tokens: the three complete collector sessions containing
+  token fields total 1,013,785 tokens. This excludes historical desktop
+  sessions not recorded by the official collector.
+- Verification gate: static audit, deterministic replay, property tests,
+  JSC-only build, visual PDF review, video metadata review and package privacy
+  scan.
