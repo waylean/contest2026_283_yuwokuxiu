@@ -45,6 +45,49 @@ export function createPlayerGeometry(profile) {
   }
 }
 
+export function createAdaptiveThresholds(noiseAccel, noiseJerk, intervalMs) {
+  const accelNoise = clamp(noiseAccel, 0, 2.4)
+  const jerkNoise = clamp(noiseJerk, 0, 45)
+  const interval = clamp(intervalMs, 20, 120)
+  const slowSamplingAllowance = clamp01((interval - 35) / 85)
+
+  return {
+    activeAccel: round2(clamp(5.2 + accelNoise * 1.15, 5.2, 8.2)),
+    activeJerk: round2(
+      clamp(86 + jerkNoise * 1.05 - slowSamplingAllowance * 8, 78, 160)
+    ),
+    startAccel: round2(clamp(8.8 + accelNoise * 1.7, 8.8, 13.2)),
+    startJerk: round2(
+      clamp(122 + jerkNoise * 1.45 - slowSamplingAllowance * 10, 112, 220)
+    ),
+    hardStartAccel: round2(clamp(13 + accelNoise * 2, 13, 18.5))
+  }
+}
+
+export function updateNoiseEstimate(state, motionAccel, jerk, swingActive) {
+  if (!state || typeof state !== 'object') return state
+  const accel = Math.max(0, Number(motionAccel) || 0)
+  const jerkValue = Math.max(0, Number(jerk) || 0)
+  if (swingActive || accel >= 2.4 || jerkValue >= 38) {
+    state.quietSamples = 0
+    return state
+  }
+
+  state.quietSamples = Math.min(250, (Number(state.quietSamples) || 0) + 1)
+  if (state.quietSamples < 25) return state
+
+  const samples = Math.max(0, Number(state.samples) || 0)
+  const alpha = samples < 50 ? 0.12 : 0.025
+  state.accel = samples > 0
+    ? (Number(state.accel) || 0) * (1 - alpha) + accel * alpha
+    : accel
+  state.jerk = samples > 0
+    ? (Number(state.jerk) || 0) * (1 - alpha) + jerkValue * alpha
+    : jerkValue
+  state.samples = Math.min(5000, samples + 1)
+  return state
+}
+
 export function scoreSwingQuality(metrics) {
   const peakAccel = Math.max(0, Number(metrics.peakAccel) || 0)
   const peakJerk = Math.max(0, Number(metrics.peakJerk) || 0)
@@ -79,6 +122,14 @@ export function scoreSwingQuality(metrics) {
   if (intervalMs > 120) reason = '采样'
   else if (samples < 3 || durationMs < 55 || durationMs > 720) reason = '时长'
   else if (peakAccel < 10.8 || (peakJerk < 130 && peakAccel < 22)) reason = '信号'
+  else if (
+    peakAccel >= 28 &&
+    halfWidthMs <= Math.max(70, intervalMs * 2.4) &&
+    (
+      samples <= 5 ||
+      impulse / Math.max(1, peakAccel) < 0.085
+    )
+  ) reason = '冲击'
   else if (energyIntegral < 1.55 && peakAccel < 22) reason = '能量'
   else if (directionRatio < 0.12) reason = '方向'
   else if (directionRatio < 0.2 && peakAccel < 34) reason = '方向'
@@ -334,12 +385,79 @@ export function isRecoveryReturn(current, previous) {
   const speedRatio =
     (Number(current.racketSpeedKmh) || 0) /
     Math.max(1, Number(previous.racketSpeedKmh) || 0)
+  const directionCosine = compareDirection(current, previous)
+
+  if (directionCosine !== null) {
+    const oppositeDirection = directionCosine < -0.08
+    const substantiallyChangedDirection = directionCosine < 0.28
+    if (elapsedMs < 300) {
+      return (
+        oppositeDirection &&
+        peakRatio < 0.78 &&
+        impulseRatio < 0.84
+      )
+    }
+    if (elapsedMs < 850) {
+      return (
+        (oppositeDirection && peakRatio < 0.78 && impulseRatio < 0.84) ||
+        (substantiallyChangedDirection && peakRatio < 0.66 && impulseRatio < 0.74)
+      )
+    }
+    return (
+      substantiallyChangedDirection &&
+      peakRatio < 0.58 &&
+      impulseRatio < 0.68 &&
+      speedRatio < 0.72
+    )
+  }
 
   if (elapsedMs < 300) return peakRatio < 1.08 && impulseRatio < 1.02
   if (elapsedMs < 850) {
     return (peakRatio < 0.76 && impulseRatio < 0.86) || speedRatio < 0.76
   }
   return peakRatio < 0.58 && impulseRatio < 0.68 && speedRatio < 0.72
+}
+
+function compareDirection(current, previous) {
+  const currentVector = readDirection(current)
+  const previousVector = readDirection(previous)
+  if (!currentVector || !previousVector) return null
+
+  const currentNorm = Math.sqrt(
+    currentVector.x * currentVector.x +
+      currentVector.y * currentVector.y +
+      currentVector.z * currentVector.z
+  )
+  const previousNorm = Math.sqrt(
+    previousVector.x * previousVector.x +
+      previousVector.y * previousVector.y +
+      previousVector.z * previousVector.z
+  )
+  if (currentNorm < 0.08 || previousNorm < 0.08) return null
+
+  return clamp(
+    (
+      currentVector.x * previousVector.x +
+      currentVector.y * previousVector.y +
+      currentVector.z * previousVector.z
+    ) / (currentNorm * previousNorm),
+    -1,
+    1
+  )
+}
+
+function readDirection(event) {
+  const source = event && event.directionVector
+    ? event.directionVector
+    : event
+  if (!source) return null
+  const x = Number(source.x !== undefined ? source.x : source.directionX)
+  const y = Number(source.y !== undefined ? source.y : source.directionY)
+  const z = Number(source.z !== undefined ? source.z : source.directionZ)
+  if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) {
+    return null
+  }
+  return { x, y, z }
 }
 
 // TEST_ONLY_BEGIN
@@ -357,7 +475,12 @@ export function evaluateSwingWindow(metrics, profile, previous) {
       Number(metrics.impulse) || 0,
       Number(metrics.dominantImpulse) || 0
     ),
-    racketSpeedKmh: estimate.racketSpeedKmh
+    racketSpeedKmh: estimate.racketSpeedKmh,
+    directionVector: {
+      x: Number(metrics.directionX) || 0,
+      y: Number(metrics.directionY) || 0,
+      z: Number(metrics.directionZ) || 0
+    }
   }
   if (isRecoveryReturn(event, previous)) {
     return { accepted: false, reason: '回位', quality, estimate }

@@ -8,10 +8,6 @@
     "check": "npm --prefix quickapp/bmt_smash run contest:check && node skills/openvela-wearable-swing/scripts/audit-project.mjs .",
     "replay": "npm --prefix quickapp/bmt_smash run replay:check",
     "build": "npm --prefix quickapp/bmt_smash run build",
-    "emulator:capture": "npm --prefix quickapp/bmt_smash run emulator:capture",
-    "capture:check": "node tools/real-device-capture/tools/check-capture.mjs",
-    "capture:test": "node --test tools/real-device-capture/test/*.test.mjs",
-    "capture:recover": "node tools/real-device-capture/tools/recover-export.mjs",
-    "capture:listen": "bash tools/real-device-capture/tools/run-astrobox-capture.sh"
+    "emulator:capture": "npm --prefix quickapp/bmt_smash run emulator:capture"
   }
 }

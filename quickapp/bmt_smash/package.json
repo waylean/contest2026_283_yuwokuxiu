@@ -8,7 +8,7 @@
     "start": "node tools/sync-algorithm-runtime.mjs && aiot start --watch --enable-jsc",
     "build": "node tools/sync-algorithm-runtime.mjs && node tools/build-contest.mjs",
     "release": "node tools/sync-algorithm-runtime.mjs && aiot release --enable-jsc",
-    "check": "node tools/check-contest-project.mjs && node tools/validate-algorithm.mjs",
+    "check": "node tools/check-contest-project.mjs && node tools/validate-algorithm.mjs && node tools/validate-algorithm-properties.mjs",
     "contest:check": "npm run check && node tools/check-contest-package.mjs",
     "replay:check": "node tools/replay-sensor-fixture.mjs",
     "validate:algorithm": "node tools/validate-algorithm.mjs",

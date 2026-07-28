@@ -914,6 +914,49 @@
     }
   }
 
+  function createAdaptiveThresholds(noiseAccel, noiseJerk, intervalMs) {
+    const accelNoise = clamp(noiseAccel, 0, 2.4)
+    const jerkNoise = clamp(noiseJerk, 0, 45)
+    const interval = clamp(intervalMs, 20, 120)
+    const slowSamplingAllowance = clamp01((interval - 35) / 85)
+
+    return {
+      activeAccel: round2(clamp(5.2 + accelNoise * 1.15, 5.2, 8.2)),
+      activeJerk: round2(
+        clamp(86 + jerkNoise * 1.05 - slowSamplingAllowance * 8, 78, 160)
+      ),
+      startAccel: round2(clamp(8.8 + accelNoise * 1.7, 8.8, 13.2)),
+      startJerk: round2(
+        clamp(122 + jerkNoise * 1.45 - slowSamplingAllowance * 10, 112, 220)
+      ),
+      hardStartAccel: round2(clamp(13 + accelNoise * 2, 13, 18.5))
+    }
+  }
+
+  function updateNoiseEstimate(state, motionAccel, jerk, swingActive) {
+    if (!state || typeof state !== 'object') return state
+    const accel = Math.max(0, Number(motionAccel) || 0)
+    const jerkValue = Math.max(0, Number(jerk) || 0)
+    if (swingActive || accel >= 2.4 || jerkValue >= 38) {
+      state.quietSamples = 0
+      return state
+    }
+
+    state.quietSamples = Math.min(250, (Number(state.quietSamples) || 0) + 1)
+    if (state.quietSamples < 25) return state
+
+    const samples = Math.max(0, Number(state.samples) || 0)
+    const alpha = samples < 50 ? 0.12 : 0.025
+    state.accel = samples > 0
+      ? (Number(state.accel) || 0) * (1 - alpha) + accel * alpha
+      : accel
+    state.jerk = samples > 0
+      ? (Number(state.jerk) || 0) * (1 - alpha) + jerkValue * alpha
+      : jerkValue
+    state.samples = Math.min(5000, samples + 1)
+    return state
+  }
+
   function scoreSwingQuality(metrics) {
     const peakAccel = Math.max(0, Number(metrics.peakAccel) || 0)
     const peakJerk = Math.max(0, Number(metrics.peakJerk) || 0)
@@ -948,6 +991,14 @@
     if (intervalMs > 120) reason = '采样'
     else if (samples < 3 || durationMs < 55 || durationMs > 720) reason = '时长'
     else if (peakAccel < 10.8 || (peakJerk < 130 && peakAccel < 22)) reason = '信号'
+    else if (
+      peakAccel >= 28 &&
+      halfWidthMs <= Math.max(70, intervalMs * 2.4) &&
+      (
+        samples <= 5 ||
+        impulse / Math.max(1, peakAccel) < 0.085
+      )
+    ) reason = '冲击'
     else if (energyIntegral < 1.55 && peakAccel < 22) reason = '能量'
     else if (directionRatio < 0.12) reason = '方向'
     else if (directionRatio < 0.2 && peakAccel < 34) reason = '方向'
@@ -1203,6 +1254,31 @@
     const speedRatio =
       (Number(current.racketSpeedKmh) || 0) /
       Math.max(1, Number(previous.racketSpeedKmh) || 0)
+    const directionCosine = compareDirection(current, previous)
+
+    if (directionCosine !== null) {
+      const oppositeDirection = directionCosine < -0.08
+      const substantiallyChangedDirection = directionCosine < 0.28
+      if (elapsedMs < 300) {
+        return (
+          oppositeDirection &&
+          peakRatio < 0.78 &&
+          impulseRatio < 0.84
+        )
+      }
+      if (elapsedMs < 850) {
+        return (
+          (oppositeDirection && peakRatio < 0.78 && impulseRatio < 0.84) ||
+          (substantiallyChangedDirection && peakRatio < 0.66 && impulseRatio < 0.74)
+        )
+      }
+      return (
+        substantiallyChangedDirection &&
+        peakRatio < 0.58 &&
+        impulseRatio < 0.68 &&
+        speedRatio < 0.72
+      )
+    }
 
     if (elapsedMs < 300) return peakRatio < 1.08 && impulseRatio < 1.02
     if (elapsedMs < 850) {
@@ -1211,6 +1287,49 @@
     return peakRatio < 0.58 && impulseRatio < 0.68 && speedRatio < 0.72
   }
 
+  function compareDirection(current, previous) {
+    const currentVector = readDirection(current)
+    const previousVector = readDirection(previous)
+    if (!currentVector || !previousVector) return null
+
+    const currentNorm = Math.sqrt(
+      currentVector.x * currentVector.x +
+        currentVector.y * currentVector.y +
+        currentVector.z * currentVector.z
+    )
+    const previousNorm = Math.sqrt(
+      previousVector.x * previousVector.x +
+        previousVector.y * previousVector.y +
+        previousVector.z * previousVector.z
+    )
+    if (currentNorm < 0.08 || previousNorm < 0.08) return null
+
+    return clamp(
+      (
+        currentVector.x * previousVector.x +
+        currentVector.y * previousVector.y +
+        currentVector.z * previousVector.z
+      ) / (currentNorm * previousNorm),
+      -1,
+      1
+    )
+  }
+
+  function readDirection(event) {
+    const source = event && event.directionVector
+      ? event.directionVector
+      : event
+    if (!source) return null
+    const x = Number(source.x !== undefined ? source.x : source.directionX)
+    const y = Number(source.y !== undefined ? source.y : source.directionY)
+    const z = Number(source.z !== undefined ? source.z : source.directionZ)
+    if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) {
+      return null
+    }
+    return { x, y, z }
+  }
+
+  const calculateAdaptiveThresholds = createAdaptiveThresholds
   const calculateRestitution = estimateRestitution
   const calculateShuttleKmh = estimateShuttleKmh
   const calculateShuttleSpeedCeiling = estimateShuttleSpeedCeiling
@@ -1295,6 +1414,15 @@
       lastAcceptedPeakAccel: 0,
       lastAcceptedImpulse: 0,
       lastAcceptedSpeedKmh: 0,
+      lastAcceptedDirectionX: 0,
+      lastAcceptedDirectionY: 0,
+      lastAcceptedDirectionZ: 0,
+      noiseBaseline: {
+        accel: 0,
+        jerk: 0,
+        samples: 0,
+        quietSamples: 0
+      },
       warmupUntilTimestamp: 0,
       recentPeakTime1: 0,
       recentPeakTime2: 0,
@@ -2929,11 +3057,19 @@
       const dynJerk = Math.sqrt(jerkX * jerkX + jerkY * jerkY + jerkZ * jerkZ) / dt
       const rawJerk = Math.abs(rawMagnitude - this.lastMagnitude) / dt
       const jerk = Math.max(dynJerk, rawJerk * 0.8)
+      updateNoiseEstimate(this.noiseBaseline, motionAccel, jerk, this.swingActive)
+      const adaptive = calculateAdaptiveThresholds(
+        this.noiseBaseline.accel,
+        this.noiseBaseline.jerk,
+        dtMs
+      )
       this.updateWaveform(now, motionAccel)
       const energy = motionAccel * motionAccel
       const smoothedEnergy = this.energyAvg ? this.energyAvg * 0.78 + energy * 0.22 : energy
-      const active = motionAccel > 5.2 || jerk > 86
-      const startBurst = (motionAccel > 8.8 && jerk > 122) || motionAccel > 13.0
+      const active = motionAccel > adaptive.activeAccel || jerk > adaptive.activeJerk
+      const startBurst =
+        (motionAccel > adaptive.startAccel && jerk > adaptive.startJerk) ||
+        motionAccel > adaptive.hardStartAccel
       const sinceLastSwing = now - this.lastSwingTimestamp
       const strongContinuation = this.lastAcceptedPeakAccel > 0 && motionAccel > this.lastAcceptedPeakAccel * 0.92 && jerk > 130
       const canStart = sinceLastSwing > 320 || (sinceLastSwing > 230 && strongContinuation)
@@ -3142,6 +3278,9 @@
       const energyIntegral = this.swingAccelSqSum * Math.min(0.08, this.sampleIntervalMs / 1000)
       const burstRatio = this.swingPeakAccel / Math.max(1.2, avgAccel)
       const dominantImpulse = Math.max(this.swingPosX, this.swingNegX, this.swingPosY, this.swingNegY, this.swingPosZ, this.swingNegZ)
+      const directionX = this.swingPosX - this.swingNegX
+      const directionY = this.swingPosY - this.swingNegY
+      const directionZ = this.swingPosZ - this.swingNegZ
       const directionRatio = dominantImpulse / Math.max(0.1, this.swingImpulse)
       const peakLatencyMs = Math.max(0, this.swingPeakTimestamp - this.swingStartTimestamp)
       const halfWidthMs = this.swingHighSamples * this.sampleIntervalMs
@@ -3182,7 +3321,14 @@
         qualityScore: quality.score
       })
 
-      if (this.isRecoveryReturn(now, estimate, dominantImpulse)) {
+      if (this.isRecoveryReturn(
+        now,
+        estimate,
+        dominantImpulse,
+        directionX,
+        directionY,
+        directionZ
+      )) {
         this.modeName = this.running ? '训练中' : 'BMT Smash'
         this.message = '忽略回位, 峰值 ' + this.round1(this.swingPeakAccel)
         return
@@ -3194,6 +3340,9 @@
       this.lastAcceptedPeakAccel = this.swingPeakAccel
       this.lastAcceptedImpulse = Math.max(this.swingImpulse, dominantImpulse)
       this.lastAcceptedSpeedKmh = estimate.racketSpeedKmh
+      this.lastAcceptedDirectionX = directionX
+      this.lastAcceptedDirectionY = directionY
+      this.lastAcceptedDirectionZ = directionZ
       const intensityIndex = this.estimateSwingIntensityIndex(estimate, {
         qualityScore: quality.score,
         directionRatio: directionRatio,
@@ -3218,17 +3367,27 @@
       this.saveSessionSnapshot()
     },
 
-    isRecoveryReturn (now, estimate, dominantImpulse) {
+    isRecoveryReturn (now, estimate, dominantImpulse, directionX, directionY, directionZ) {
       return evaluateRecoveryReturn({
         at: now,
         peakAccel: this.swingPeakAccel,
         impulse: Math.max(this.swingImpulse, dominantImpulse),
-        racketSpeedKmh: estimate.racketSpeedKmh
+        racketSpeedKmh: estimate.racketSpeedKmh,
+        directionVector: {
+          x: directionX,
+          y: directionY,
+          z: directionZ
+        }
       }, {
         at: this.lastSwingTimestamp,
         peakAccel: this.lastAcceptedPeakAccel,
         impulse: this.lastAcceptedImpulse,
-        racketSpeedKmh: this.lastAcceptedSpeedKmh
+        racketSpeedKmh: this.lastAcceptedSpeedKmh,
+        directionVector: {
+          x: this.lastAcceptedDirectionX,
+          y: this.lastAcceptedDirectionY,
+          z: this.lastAcceptedDirectionZ
+        }
       })
     },
 
@@ -3281,6 +3440,15 @@
       this.lastAcceptedPeakAccel = 0
       this.lastAcceptedImpulse = 0
       this.lastAcceptedSpeedKmh = 0
+      this.lastAcceptedDirectionX = 0
+      this.lastAcceptedDirectionY = 0
+      this.lastAcceptedDirectionZ = 0
+      this.noiseBaseline = {
+        accel: 0,
+        jerk: 0,
+        samples: 0,
+        quietSamples: 0
+      }
       this.sessionStartTimestamp = 0
       this.sessionCreatedTimestamp = 0
       this.sessionAccumulatedMs = 0

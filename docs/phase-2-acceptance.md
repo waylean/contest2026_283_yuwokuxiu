@@ -13,7 +13,7 @@ Date: 2026-07-27
 | Check | Result |
 | --- | --- |
 | Standalone boundary and contest metadata | Pass |
-| Canonical algorithm and generated runtime parity | Pass |
+| Canonical scoring/estimation functions and generated runtime parity | Pass |
 | Rest and casual-arm false-positive guards | Pass |
 | Periodic running-motion guard | Pass |
 | Recovery return filter | Pass |
@@ -37,9 +37,9 @@ Screenshots are in `preview/exports/contest-emulator/`.
 - `05-history-after-relaunch.png`
 
 The generic emulator image lacks the target device's health and brightness
-services. The application continued through both missing services. Heart-rate
-accuracy and target-specific brightness behavior require the final 10 Pro
-real-device pass.
+services. The application continued through both missing services. No
+heart-rate accuracy or target-specific brightness claim is made from emulator
+evidence.
 
 ## Blind review
 
@@ -51,16 +51,14 @@ history after cold load, reject poor-direction impacts, replay the production
 warm-up path, reduce storage writes and make emulator screenshots fail on
 blank output.
 
-The review does not claim field accuracy. A labeled real-device sensor dataset
-and the long-session test below remain required before accuracy or endurance
-claims are made.
+The review does not claim field accuracy. Accuracy metrics remain out of scope
+until a future video-backed, manually reviewed and frozen field dataset exists.
+Current acceptance is limited to deterministic algorithm properties, emulator
+lifecycle behavior and explicit capability boundaries.
 
 ## Remaining gate
 
-Install the generated RPK on Xiaomi Smart Band 10 Pro and verify:
-
-1. A 20-minute training session with at least 30 deliberate swings.
-2. Normal walking, preparation and post-hit recovery do not inflate the count.
-3. Heart-rate values update without affecting accelerometer sampling.
-4. End the session and observe the device for at least 30 seconds.
-5. Reopen the app and confirm the session summary appears in history.
+1. Run the automated algorithm, replay, property and privacy checks.
+2. Capture start, pause, stop, exit and cold-relaunch behavior in the emulator.
+3. Run a bounded long-session emulator scenario and document storage growth.
+4. Keep product footage separate from detector-accuracy evidence.

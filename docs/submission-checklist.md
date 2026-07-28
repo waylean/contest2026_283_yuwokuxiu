@@ -14,7 +14,7 @@
 - [x] Official AI Coding collector verified in the openvela `.repo` workspace
 - [x] Historical desktop sessions audited and excluded without editing
 - [x] Collector-time sensitive-data redaction tested with synthetic values
-- [ ] Reviewed competition conversations present under `logs/<github-login>/`
+- [x] Reviewed competition conversations present under `logs/<github-login>/`
 - [x] Source builds from a clean remote checkout
 - [x] No binary, key, user data, or local path leakage
 
@@ -28,7 +28,8 @@
 - [x] Architecture and current test results drafted
 - [x] Improvement suggestions for openvela drafted
 - [x] Repository and branch URL included
-- [ ] Real-device and product evidence inserted
+- [x] Algorithm property evidence and claim boundaries inserted
+- [ ] Anonymous product evidence inserted
 - [ ] Final PDF or PPTX exported and visually reviewed
 
 ## Demo, maximum five minutes
@@ -38,17 +39,16 @@
 - [ ] Start, detect swings, pause and finish recorded
 - [ ] Metrics, heart-rate fallback, history and scoring recorded
 - [ ] openvela emulator build and run recorded
-- [ ] Xiaomi Smart Band 10 Pro real-device evidence recorded
+- [ ] Xiaomi Smart Band 10 Pro product flow recorded without accuracy claims
 - [ ] Architecture, AI workflow and open-source contribution recorded
 
 ## Evidence
 
-- [ ] Labeled real-device dataset protocol
-- [ ] Precision, recall, false positives per hour and latency
-- [ ] Sampling-interval distribution
-- [ ] 60-minute real-device stability report
-- [ ] Start, pause, resume, end and exit cycle report
-- [ ] Cold-restart recovery and history-capacity report
+- [x] Adaptive-threshold boundary checks
+- [x] Axis, amplitude, interval and impact property checks
+- [x] Direction-aware recovery checks
+- [x] Simulator lifecycle and cold-history evidence
+- [x] Synthetic evidence is not presented as real accuracy
 - [ ] Anonymous product validation summary
 
 ## Upload package

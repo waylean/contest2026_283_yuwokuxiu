@@ -12,6 +12,8 @@ const required = [
   'docs/contest-compliance.md',
   'docs/ai-native-development-log.md',
   'docs/ai-log-privacy-audit.md',
+  'docs/accelerometer-algorithm.md',
+  'docs/decision-accelerometer-first.md',
   'docs/official-requirements-2026.md',
   'docs/judging-readiness.md',
   'docs/phase-3-plan.md',
@@ -58,8 +60,7 @@ const forbiddenExtensions = new Set(['.apk', '.rpk', '.abp', '.keystore', '.pem'
 function walk (dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (entry.name === '.git' || entry.name === 'node_modules' ||
-        entry.name === 'build' || entry.name === 'dist' ||
-        entry.name === 'target' || entry.name === 'out') continue
+        entry.name === 'build' || entry.name === 'dist') continue
     const full = path.join(dir, entry.name)
     if (entry.isDirectory()) {
       walk(full)

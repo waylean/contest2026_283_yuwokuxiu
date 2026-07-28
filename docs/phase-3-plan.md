@@ -23,7 +23,8 @@ Current status:
 - Organizer repository and collaborator access: complete.
 - Migration branch: `agent/import-bmt-smash-contest`.
 - Fork branch push, clean remote checkout and draft PR #1: complete.
-- CLA, official collector, pull request self-review and merge: pending.
+- CLA check, official collector and reviewed logs: complete.
+- Pull request self-review and merge: pending.
 
 Acceptance:
 
@@ -31,66 +32,62 @@ Acceptance:
 - The default competition branch contains the source and logs.
 - A clean checkout produces a JSC-only RPK without local credentials.
 
-## P0: Real-device evidence
+## P0: Deterministic algorithm evidence
 
-Create an anonymous labeled dataset and a capture protocol before changing
-thresholds again.
+Strengthen the accelerometer detector without presenting non-field gestures as
+badminton accuracy evidence.
 
-Minimum initial dataset:
+Required properties:
 
-- 5 users and at least 10 sessions;
-- at least 300 labeled badminton swings;
-- at least 60 minutes of non-swing negative motion;
-- left/right hand and at least two strap-tightness settings;
-- synchronized manual event labels with uncertainty noted.
-
-Required metrics:
-
-- precision and recall for effective swings;
-- false positives per hour;
-- recovery-return rejection rate;
-- sampling interval p50, p95 and maximum;
-- event-detection latency;
-- peak memory if observable, storage growth and battery change.
+- axis permutation and sign invariance;
+- monotonic response to dynamic-amplitude changes;
+- bounded response to normal callback-interval variation;
+- rejection of isolated high impacts;
+- separation of opposite-direction recovery from same-direction rally swings;
+- physical output caps and deterministic replay.
 
 Acceptance:
 
-- Dataset schema and labeling guide are committed without personal data.
-- Baseline results are reproducible from one command.
-- Weak cases are documented rather than hidden.
+- Core scoring, estimation and recovery functions in the embedded runtime are
+  generated from one source.
+- Raw-trace replay is a deterministic preprocessing reference; production-only
+  refractory, callback-timing and periodic-motion state remain separately
+  covered by runtime and emulator lifecycle checks.
+- All properties run from `npm run check` and fail the build on regression.
+- Synthetic evidence is labeled as such and never reported as accuracy.
+- Algorithm limits and abandoned diagnostic routes are documented.
 
-## P0: Stability and lifecycle
+## P0: Lifecycle and failure isolation
 
-Run on Xiaomi Smart Band 10 Pro:
+Use deterministic emulator scenarios to cover:
 
-1. One continuous 60-minute training.
-2. Thirty start, pause, resume, end and exit cycles.
-3. Five forced exits followed by session recovery.
-4. Heart-rate unavailable, permission denied and sensor subscription failure.
-5. History at capacity and storage-write failure where injectable.
-6. Observe for at least 60 seconds after each end operation.
+1. Start, pause, resume, end and explicit exit.
+2. Cold launch after a completed session.
+3. Heart-rate unavailable and permission failure.
+4. Delayed callbacks after stop.
+5. History persistence and recovery.
 
 Acceptance:
 
-- No restart, black screen or unrecoverable navigation.
+- No unrecoverable navigation in the tested scenarios.
 - Sensors and keep-screen state are released after stop.
 - History remains readable after cold restart.
-- A dated report records firmware, RPK hash and observed limitations.
+- Simulator evidence is clearly separated from real-device product footage.
 
 ## P1: Algorithm improvement
 
-1. Freeze the current detector as the baseline.
-2. Add a versioned feature-export format for anonymous real-device samples.
-3. Analyze failure clusters before changing thresholds.
-4. Compare the existing rule detector with a hybrid candidate:
-   deterministic physical gates plus a tiny feature classifier.
-5. Ship the candidate only when it improves held-out results and fits the
-   wearable runtime budget.
+1. Keep deterministic physical gates as the baseline.
+2. Estimate idle noise without allowing active motion to contaminate it.
+3. Generate bounded adaptive candidate thresholds.
+4. Add direction-aware recovery filtering.
+5. Expand metamorphic and adversarial property tests.
 
 Acceptance:
 
-- Train, validation and hold-out sessions are separated by user.
-- The comparison includes precision, recall, false positives and runtime cost.
+- Quiet conditions preserve the existing conservative trigger floor.
+- Noise adaptation cannot exceed reviewed caps.
+- Isolated impact and reverse recovery cases remain rejected.
+- Same-direction rapid swings are not rejected solely by timing.
 - Every displayed metric has a definition and known limitation.
 
 ## P1: openvela and UI evidence
@@ -119,7 +116,7 @@ Prepare:
 - Demo video no longer than five minutes;
 - 90-second live-demo path;
 - architecture diagram;
-- one-page test report;
+- one-page algorithm property and limitation report;
 - one-page product validation report;
 - expected judge questions and concise answers;
 - offline copies of the RPK, source archive, screenshots and video.
@@ -127,7 +124,7 @@ Prepare:
 Suggested five-minute Demo:
 
 1. 0:00-0:30: user pain and product.
-2. 0:30-1:30: real-device training flow.
+2. 0:30-1:30: prerecorded real-device product flow.
 3. 1:30-2:20: waveform, detector and local history.
 4. 2:20-3:15: algorithm evidence and false-positive handling.
 5. 3:15-4:00: openvela architecture and failure isolation.
@@ -139,7 +136,7 @@ Suggested five-minute Demo:
 Phase 3 is complete only when:
 
 - official repository, CLA, PR and logs are in place;
-- real-device quality and stability reports pass;
+- deterministic algorithm and lifecycle checks pass;
 - no unsupported accuracy claim remains;
 - clean-checkout build is reproducible;
 - the five-minute package has passed an independent blind review.

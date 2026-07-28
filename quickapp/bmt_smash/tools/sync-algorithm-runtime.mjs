@@ -20,6 +20,7 @@ const algorithm = fs
   .replace(/^export\s+/gm, '')
   .trim()
 const aliases = [
+  'const calculateAdaptiveThresholds = createAdaptiveThresholds',
   'const calculateRestitution = estimateRestitution',
   'const calculateShuttleKmh = estimateShuttleKmh',
   'const calculateShuttleSpeedCeiling = estimateShuttleSpeedCeiling',

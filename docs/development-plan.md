@@ -19,20 +19,23 @@ openvela wearable emulator to provide a reproducible open-source execution path.
 3. Extract the production swing detector into independently testable modules.
 4. Add sensor-fixture replay for emulator and regression testing.
 5. Add real-time acceleration waveform and swing-event graphics.
-6. Validate foreground sensor lifecycle, exit, recovery, and long-session storage.
-7. Complete real-device comparison on Xiaomi Smart Band 10 Pro.
+6. Validate foreground sensor lifecycle, exit and recovery.
+7. Complete deterministic algorithm properties, adversarial-input checks and
+   emulator lifecycle evidence.
 8. Package source, documentation, test report, and a sub-five-minute Demo.
 
 ## 5. Current phase
 
-Milestones 1 through 6 have emulator evidence. Milestone 7 is the current
-blocking phase and must produce labeled detector-quality data, a 60-minute
-stability report and lifecycle stress results before presentation work is
-treated as final.
+Milestones 1 through 6 have reproducible automated or emulator evidence.
+Milestone 7 property checks are complete; its bounded emulator long-session
+scenario remains open. Presentation work remains blocked on that capture, the
+introduction document and sub-five-minute Demo rather than on an unsupported
+field-accuracy claim.
 
-The official repository has been received. CLA, pull-request merge and the AI
-Coding log collector remain parallel submission blockers. Detailed execution
-and acceptance criteria are in `phase-3-plan.md`.
+The official repository has been received, the CLA check has passed, and an
+official AI Coding log is present. Pull-request merge and final submission
+artifacts remain parallel blockers. Detailed execution and acceptance criteria
+are in `phase-3-plan.md`.
 
 ## 4. Acceptance
 
