@@ -10,7 +10,7 @@ BMT Smash 是面向羽毛球爱好者的手环训练应用，利用持拍手腕�
 
 挥拍强度和预测球速是**训练估计值，不是雷达实测**。合成测试验证算法性质，不代表真实球场准确率；三轴加速度不能完整恢复球拍姿态。心率只作运动参考，不用于医疗诊断。
 
-评审材料：[作品介绍 PDF](submission/materials/BMT-Smash.pdf)、[可编辑 DOCX](submission/materials/BMT-Smash.docx)、[两分钟演示视频](submission/materials/BMT-Smash-demo.mp4)、[材料目录](submission/README.md)。
+评审材料：[技术报告 PDF](submission/materials/BMT%20Smash%20技术报告.pdf)、[技术报告 DOCX](submission/materials/BMT%20Smash%20技术报告.docx)、[两分钟演示视频](submission/materials/BMT-Smash-demo.mp4)、[材料目录](submission/README.md)。技术报告按官方作品提交模板组织，包含信息表、摘要与 3.1–3.7 正文；本页为源码复现入口。
 
 ## 二、选题方向
 
