@@ -7,8 +7,8 @@
 - 当前提交分支：`agent/import-bmt-smash-contest`
 - 提交 PR：<https://github.com/open-vela/contest2026_283_yuwokuxiu/pull/1>
 - CLA：通过
-- 合并状态：CLEAN
-- 当前状态：Ready for review，尚未合并
+- 合并状态：MERGED
+- 当前状态：2026-09-08 已合并，提交 48ead663651eedfec3768a88c479eb911045c4b1
 
 ## 自动验证
 
@@ -27,4 +27,4 @@
 
 ## 最终动作
 
-PR #1 已转为 Ready for review。赛事截止前仍需确认源码已合并至 `dev-ai-contest-2026`。
+PR #1 已合并至 `dev-ai-contest-2026`。正式附件在旧 Mac 压缩包中，尚未补入仓库；参见本目录 README 的材料状态说明。

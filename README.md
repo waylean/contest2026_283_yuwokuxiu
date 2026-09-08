@@ -1,98 +1,124 @@
 # BMT Smash
 
-BMT Smash 是面向羽毛球爱好者的 openvela 独立手环训练应用。应用在小米手环
-10 Pro 上使用三轴加速度计识别候选挥拍，过滤普通摆臂、跑动、撞击和击球后
-回位动作，并在手环本地显示挥拍强度、有效挥拍、预测球速、心率、历史记录和
-比分。
+## 一、作品简介
 
-本作品属于 **手表应用创新** 方向，核心训练流程不依赖手机、网络或云服务。
+**队伍：羽我苦修（283）｜目标设备：小米手环 10 Pro 独立版。**
 
-## 用户问题
+BMT Smash 是面向羽毛球爱好者的手环训练应用，利用持拍手腕三轴加速度识别具有挥拍形态的动作，在手环本地提供挥拍强度、有效次数、预测球速、实时波形、可选心率、历史回放和计分。核心训练流程不依赖手机、网络或云服务。
 
-普通羽毛球爱好者很难在日常球场获得挥拍反馈。专业雷达和高速摄影成本高、
-准备复杂，而手环始终位于持拍手腕，适合提供低成本、可持续的训练参考。
+日常球场缺少低成本、低干扰的反馈工具。本作品通过多特征质量门控过滤普通摆臂、跑动、窄脉冲碰撞和击球后回位，而不是仅凭一次加速度峰值判定挥拍。用户设置持拍手、身高和表带松紧后开始训练，结束后查看本地历史。
 
-BMT Smash 不将结果描述为雷达实测。挥拍强度和预测球速是基于腕部加速度、
-人体尺寸和球拍物理关系得到的训练估计值。
+挥拍强度和预测球速是**训练估计值，不是雷达实测**。合成测试验证算法性质，不代表真实球场准确率；三轴加速度不能完整恢复球拍姿态。心率只作运动参考，不用于医疗诊断。
 
-## 产品流程
+评审材料：[作品介绍](submission/BMT-Smash-作品介绍.md)、[附件状态](submission/README.md)、[算法说明](docs/accelerometer-algorithm.md)、[验收记录](docs/phase-2-acceptance.md)、[模拟器截图](preview/exports/contest-emulator/)。
 
-1. 用户设置持拍手、身高和表带松紧。
-2. 在控制页开始训练。
-3. 应用以前台高频加速度采样识别有效挥拍。
-4. 指标页显示实时加速度波形、挥拍强度、有效次数、最大强度和预测球速。
-5. 心率服务可用时显示当前、平均和最高心率；不可用不会阻塞挥拍检测。
-6. 结束后将摘要写入本地历史，支持冷启动恢复。
-7. 应用包含独立计分和明确退出路径。
+## 二、选题方向
 
-## openvela 能力
+**快应用 / 手表应用创新。** 选择已有手环作为载体，通过 openvela Quick App 图形、传感器和本地存储能力提供羽毛球专项训练体验，不涉及新开发板、BSP、驱动或固件移植。Android 联动版不属于本次参赛范围。
 
-| 能力 | 用途 |
+| 能力 | 使用方式 |
 | --- | --- |
-| Quick App 图形与交互 | 七个可滑动页面、实时波形、历史和计分 |
-| `system.sensor` | 前台三轴加速度采样 |
-| `service.health` | 可选心率读取和故障隔离 |
-| `system.storage` | 设置、训练恢复和本地历史 |
-| `system.brightness` | 训练期间保持屏幕可见 |
-| `system.router` | 可恢复的明确退出 |
+| Quick App 图形与交互 | 横向页面导航、实时波形、历史列表和计分 |
+| `system.sensor` | 前台三轴加速度采样，申请 game 档，实际间隔以回调为准 |
+| `service.health` | 可选心率读取，失败时独立降级 |
+| `system.storage` | 设置、训练快照与有界历史摘要 |
+| `system.brightness` | 训练亮屏管理，能力缺失不阻塞主流程 |
+| `system.router` | 明确退出与重新进入 |
 
-## 目录
+图形与采样分离，UI 按 80 ms 节流；候选窗口结合峰值、jerk、冲量、持续时间和方向一致性判断。停止后的延迟回调被隔离，避免继续修改训练状态。详见[架构说明](docs/architecture.md)。
 
-- `quickapp/bmt_smash/`：小米手环 10 Pro 独立版 Quick App。
-- `test-data/`：匿名合成传感器回放数据。
-- `preview/exports/contest-emulator/`：336×480 模拟器验收截图。
-- `skills/openvela-wearable-swing/`：可复用 AI Coding Skill。
-- `docs/`：架构、算法边界、赛事要求、验收和后续计划。
-- `logs/`：官方采集器导出的 AI Coding 日志。
+## 三、目录结构
 
-## 构建与验证
+| 路径 | 用途 |
+| --- | --- |
+| `quickapp/bmt_smash/src/` | 独立快应用界面、生命周期与设备能力调用 |
+| `quickapp/bmt_smash/src/common/scripts/competitionSwingAlgorithm.js` | 规范算法源，构建时确定性同步到运行时 |
+| `quickapp/bmt_smash/tools/` | 构建、一致性检查、回放、性质测试与自动截图 |
+| `test-data/` | 合成传感器夹具，不含真实用户数据 |
+| `preview/exports/contest-emulator/` | 336×480 模拟器截图 |
+| `docs/` | 算法、架构、验收、AI 工作流与隐私说明 |
+| `logs/` | 官方采集器 AI Coding 日志及索引 |
+| `skills/openvela-wearable-swing/` | 可复用 Skill 和项目审计脚本 |
+| `submission/` | 作品介绍、材料索引与提交状态 |
+| `contest2026_283_yuwokuxiu.xml` | 队伍 manifest 与应用目录映射 |
+| `LICENSE`、`NOTICE`、`THIRD_PARTY_NOTICES.md` | Apache-2.0 与第三方依赖说明 |
+
+## 四、运行方式
+
+### 4.1 环境准备
+
+已有验收来自 **macOS、AIoT 工具链 2.0.5、336×480 模拟器**。需要 Git、Node.js/npm 和 AIoT-IDE；依赖版本以 `quickapp/bmt_smash/package-lock.json` 为准。Node.js 最低版本尚未单独验证，应按工具链官方要求安装。
+
+当前构建和截图包装脚本使用 POSIX 路径及 `.bin/aiot`，**不宣称 Windows 原生脚本已经验收**。本次仅整理文档，未重新进行真机或 Windows 模拟器验收。
+
+官方入口：[AIoT-IDE 使用文档](https://iot.mi.com/vela/quickapp/zh/guide/start/use-ide.html)、[大赛快应用教程](https://github.com/open-vela/docs/blob/dev-ai-contest-2026/zh-cn/contest_2026/quickapp/quickapp_guide_index.md)。
+
+### 4.2 获取、检查与构建
+
+仅构建快应用无需编译整套固件：
 
 ```bash
+git clone --branch dev-ai-contest-2026 https://github.com/open-vela/contest2026_283_yuwokuxiu.git
+cd contest2026_283_yuwokuxiu
 npm run install:quickapp
 npm run check
 npm run replay
 npm run build
 ```
 
-构建使用 Xiaomi Vela/openvela Quick App 工具链，启用 JSC，禁用
-protobuf。生成的 RPK、签名材料和本地设备凭据不进入仓库。
+预期输出包含算法源码/运行时一致性通过、误判/回位/单调性/上限性质测试通过，以及 `build success`。合成回放结果不是实战检出率。
 
-模拟器证据：
+当前版本产物：
+
+```text
+quickapp/bmt_smash/dist/com.waylean.bmtsmash.contest.debug.0.1.0.rpk
+```
+
+构建启用 JSC，不启用 protobuf。RPK 和私人签名材料不随源码提交；调试产物不代表已取得官方商店发布资格。
+
+如需通过赛事 manifest 拉取完整工作区，先安装官方要求的 `repo` 工具，再执行：
+
+```bash
+repo init -u https://github.com/open-vela/contest2026_283_yuwokuxiu -b dev-ai-contest-2026 -m contest2026_283_yuwokuxiu.xml
+repo sync -c -j8
+```
+
+应用映射至 `packages/apps/contest2026_283_bmt_smash`，不要求烧写自定义固件。
+
+### 4.3 模拟器部署与操作
+
+1. 用 AIoT-IDE 打开 `quickapp/bmt_smash`，按官方教程安装模拟器 SDK/镜像并创建 336×480 虚拟设备。
+2. 自动截图脚本要求设备名为 `Vela_WForge_review_band10pro`。脚本不会自动下载镜像或创建设备。
+3. 完成构建后，在仓库根目录执行：
 
 ```bash
 npm run emulator:capture
 ```
 
-该命令安装应用并验证控制页、指标页、心率页、开始与结束生命周期，以及退出
-后冷启动恢复历史。
+脚本启动指定设备，推送并安装 RPK，启动 `com.waylean.bmtsmash.contest`，检查页面、结束后的存活状态、退出和冷启动历史恢复，输出五张截图至 `preview/exports/contest-emulator/`，最后停止模拟器。
 
-## 算法边界
+手动体验可通过 IDE 部署构建产物，打开 BMT Smash，设置持拍信息并开始训练；左右滑动查看各页，结束后查看历史，使用控制页退出按钮退出。模拟器没有真实挥拍信号时，次数保持零不代表异常，信号链路可通过 `npm run replay` 验证。
 
-算法采用可解释的物理特征和质量门控，包括峰值动态加速度、jerk、冲量、
-持续时间、方向一致性、峰值位置和回位关系。静止噪声驱动有上下界的自适应
-触发门槛；相邻动作的三轴净冲量方向用于区分反向回位和同方向连续挥拍。当前
-合成回放只验证算法性质，不代表真实准确率。详见
-`docs/accelerometer-algorithm.md`。
+### 4.4 已知限制与排错
 
-## AI Coding
+- `Missing emulator`：先创建脚本指定名称的设备并完成 SDK/镜像配置。
+- `Missing RPK`：先构建，检查产物路径是否一致。
+- 通用镜像可能缺少健康和亮屏服务，心率显示缺省值；主训练流程应继续。模拟器不能证明真机心率可用性。
+- 已归档验收覆盖启动、导航、短训练、停止、退出及冷启动历史；长时间球场稳定性与真实准确率仍需独立验证。
+- 基线是前台训练，不承诺任意机型息屏后台采样或与系统运动并行运行。
 
-AI 协作覆盖需求整理、代码重构、算法测试、模拟器调试、双智能体盲审和赛事
-材料整理。可复用流程沉淀在 `skills/openvela-wearable-swing/`，结构化摘要在
-`docs/ai-native-development-log.md`。官方格式对话由赛事采集器写入 `logs/`。
-历史会话的完整性与隐私处理见 `docs/ai-log-privacy-audit.md`。
+## 五、AI Coding 使用说明
 
-## 当前证据
+AI 协作覆盖需求拆解、方案设计、代码实现、调试、测试与文档整理；人工确定目标用户、独立版范围、产品取舍和证据边界。Codex 参与实现与验收，独立 AI 审查用于查找算法和生命周期问题，K3 设计委派与 HyperFrames 用于演示材料。
 
-- 独立应用边界和敏感信息扫描通过。
-- 核心评分、估算与回位函数的源码/运行时一致性检查通过。
-- 误判、回位、强度单调性和物理上限测试通过。
-- 坐标变化、幅值、回调间隔和单点冲击性质测试通过。
-- JSC-only 构建通过。
-- 模拟器启动、训练、停止、退出、冷启动历史恢复通过。
+实际帮助包括：将商业/联动版本隔离为独立参赛版；建立唯一算法源及一致性检查；构造坐标、幅值、回调间隔和窄脉冲性质测试；通过模拟器定位模块兼容与退出清理问题。AI 输出必须经过检查，不能以生成成功代替验收。
 
-完整结果见 `docs/phase-2-acceptance.md`。
+- [结构化开发日志](docs/ai-native-development-log.md)：阶段目标、修改、审查和验证。
+- [官方日志](logs/waylean/)：采集器会话与 manifest。
+- [隐私审计](docs/ai-log-privacy-audit.md)：混合商业项目会话排除与脱敏策略。
+- [可复用 Skill](skills/openvela-wearable-swing/SKILL.md)：独立运行边界、结构审计和验证流程。
+- 工具使用包括本地 CLI、浏览器、GitHub 及多智能体审查；MCP 使用以具体日志为准，不把所有 CLI 调用记作 MCP。
 
-## 开源与合规
+**统计口径：** 未建立逐行 AI 代码归因，不以未经核实的百分比作为评审指标。历史材料的约 90% 是工作量估算，不是代码占比审计结果。`1,013,785` 是三份日志事件 Token 字段的历史直接求和，可能重复计算同一次响应，不能作为去重后的实际消耗或账单 Token；实际消耗待按官方采集器口径核验。
 
-本仓遵循 Apache License 2.0。作品不属于医疗设备或专业测速仪器，不上传用户
-身份、健康记录、AuthKey、签名密钥、APK 或 RPK。
+本仓使用 Apache-2.0，不包含设备 AuthKey、私人签名密钥或真实用户健康数据。
