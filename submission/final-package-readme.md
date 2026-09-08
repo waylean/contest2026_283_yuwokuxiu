@@ -32,4 +32,4 @@ npm run build
 - 目标分支：`dev-ai-contest-2026`
 - PR：https://github.com/open-vela/contest2026_283_yuwokuxiu/pull/1
 
-截至打包时，PR #1 已转为 Ready for review，CLA 检查通过，合并状态为 CLEAN；等待维护者评审与合并。
+状态更新（2026-09-08）：PR #1 已合并至官方赛事分支。本文为旧压缩包目录说明，不代表其中 PDF、DOCX 和 MP4 附件已经上传仓库；附件状态见本目录 README。

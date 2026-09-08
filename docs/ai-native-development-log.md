@@ -1,5 +1,13 @@
 # AI-Native Development Log
 
+## Correction - 2026-09-08
+
+Historical references to 90% describe an unaudited effort estimate, not a
+measured AI code ratio. The 1,013,785-token figure below is a raw sum of event
+fields and may count one response multiple times; it is not verified unique
+usage or billing. Original entries are retained as history, not as current
+audited metrics. The official five-section README is the current entry point.
+
 This file is a human-reviewed development index. It does not replace the
 official machine-generated logs required under `logs/<github-login>/`. The
 privacy and exclusion decision for historical desktop sessions is documented
