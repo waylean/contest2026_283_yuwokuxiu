@@ -1,34 +1,33 @@
-# 参赛材料索引
+# BMT Smash 参赛材料
 
-评委请先阅读仓库根目录的[作品说明](../README.md)，其结构严格采用官方五部分模板：作品简介、选题方向、目录结构、运行方式、AI Coding 使用说明。
+队伍：羽我苦修（283）
 
-## 可直接查看的材料
+赛道：快应用 / 手表应用创新
 
-| 材料 | 入口 |
+基线：小米手环 10 Pro 独立版
+
+## 作品说明
+
+[仓库首页](../README.md)与作品说明采用官方五部分结构：作品简介、选题方向、目录结构、运行方式、AI Coding 使用说明。
+
+| 材料 | 文件 |
 | --- | --- |
-| 正式介绍源稿 | [BMT Smash 作品介绍](BMT-Smash-作品介绍.md) |
-| 算法与限制 | [算法说明](../docs/accelerometer-algorithm.md) |
-| 架构 | [架构说明](../docs/architecture.md) |
-| 模拟器界面 | [五张截图](../preview/exports/contest-emulator/) |
-| 已归档验收 | [阶段验收](../docs/phase-2-acceptance.md) |
-| AI Coding | [开发日志](../docs/ai-native-development-log.md)、[官方采集记录](../logs/waylean/) |
-| 可复用 Skill | [openvela-wearable-swing](../skills/openvela-wearable-swing/SKILL.md) |
-| 提交状态 | [状态说明](submission-status.md) |
+| 作品介绍 PDF | [BMT-Smash.pdf](materials/BMT-Smash.pdf) |
+| 作品介绍 DOCX | [BMT-Smash.docx](materials/BMT-Smash.docx) |
+| 作品介绍 Markdown | [源稿](BMT-Smash-作品介绍.md) |
+| Demo 视频 | [BMT-Smash-demo.mp4](materials/BMT-Smash-demo.mp4) |
 
-## PDF、DOCX 与 Demo 附件
+Demo 时长 120 秒，1920×1080，H.264；采用模拟器画面说明产品目的、算法、架构和操作流程，无旁白。演示中的模拟信号不用于证明真实球场准确率。
 
-历史开发记录显示，正式 PDF、DOCX 和 120 秒 1920×1080 Demo 曾放入以下压缩包：
+## 技术证据
 
-`2026 首届 openvela AI 硬件开发者大赛-羽我苦修-BMT Smash.zip`
+- [算法与性质测试](../docs/accelerometer-algorithm.md)
+- [系统架构](../docs/architecture.md)
+- [阶段验收](../docs/phase-2-acceptance.md)
+- [模拟器截图](../preview/exports/contest-emulator/)
+- [AI Coding 日志](../logs/waylean/)
+- [可复用 Skill](../skills/openvela-wearable-swing/SKILL.md)
 
-它们此前仅存在于 Mac 本地压缩包，并未随 PR #1 提交。2026-09-08 在当前 Windows 环境查找时尚未找到，因此本索引**不提供不存在的下载链接，也不宣称附件已入库**。取得原压缩包后应检查文件、隐私和版本，再补入仓库或关联可访问的 Release 附件。
+## 源码
 
-旧附件可能仍含“待合并”和未核实 AI 比例/Token 汇总。后续补交前应同步最新说明；当前以根 README 与正式 Markdown 稿为准。
-
-## 历史文件
-
-`introduction-draft.md` 是历史初稿，`demo-script.md` 是早期脚本，并非最终视频附件。保留用于追踪开发过程，不作为最新评审正文。
-
-## 官方提交
-
-[PR #1](https://github.com/open-vela/contest2026_283_yuwokuxiu/pull/1) 已于 2026-09-08 合入 `dev-ai-contest-2026`。当前工作仅整理文档，不修改手环算法或运行时。
+官方仓库：[open-vela/contest2026_283_yuwokuxiu](https://github.com/open-vela/contest2026_283_yuwokuxiu)。赛事分支：`dev-ai-contest-2026`；应用目录：`quickapp/bmt_smash`。

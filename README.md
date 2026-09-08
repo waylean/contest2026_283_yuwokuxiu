@@ -10,7 +10,7 @@ BMT Smash 是面向羽毛球爱好者的手环训练应用，利用持拍手腕�
 
 挥拍强度和预测球速是**训练估计值，不是雷达实测**。合成测试验证算法性质，不代表真实球场准确率；三轴加速度不能完整恢复球拍姿态。心率只作运动参考，不用于医疗诊断。
 
-评审材料：[作品介绍](submission/BMT-Smash-作品介绍.md)、[附件状态](submission/README.md)、[算法说明](docs/accelerometer-algorithm.md)、[验收记录](docs/phase-2-acceptance.md)、[模拟器截图](preview/exports/contest-emulator/)。
+评审材料：[作品介绍 PDF](submission/materials/BMT-Smash.pdf)、[可编辑 DOCX](submission/materials/BMT-Smash.docx)、[两分钟演示视频](submission/materials/BMT-Smash-demo.mp4)、[材料目录](submission/README.md)。
 
 ## 二、选题方向
 
@@ -26,6 +26,8 @@ BMT Smash 是面向羽毛球爱好者的手环训练应用，利用持拍手腕�
 | `system.router` | 明确退出与重新进入 |
 
 图形与采样分离，UI 按 80 ms 节流；候选窗口结合峰值、jerk、冲量、持续时间和方向一致性判断。停止后的延迟回调被隔离，避免继续修改训练状态。详见[架构说明](docs/architecture.md)。
+
+对 openvela 的改进建议：统一不同设备的传感器能力矩阵和健康服务错误码；提供连续传感器 Mock 示例、生命周期测试模板和可穿戴安全区预览，降低高频传感器应用的适配成本。
 
 ## 三、目录结构
 
@@ -49,7 +51,7 @@ BMT Smash 是面向羽毛球爱好者的手环训练应用，利用持拍手腕�
 
 已有验收来自 **macOS、AIoT 工具链 2.0.5、336×480 模拟器**。需要 Git、Node.js/npm 和 AIoT-IDE；依赖版本以 `quickapp/bmt_smash/package-lock.json` 为准。Node.js 最低版本尚未单独验证，应按工具链官方要求安装。
 
-当前构建和截图包装脚本使用 POSIX 路径及 `.bin/aiot`，**不宣称 Windows 原生脚本已经验收**。本次仅整理文档，未重新进行真机或 Windows 模拟器验收。
+构建和截图脚本基于 POSIX 路径，建议在已验证的 macOS 环境复现；Windows 原生脚本兼容性未验证。
 
 官方入口：[AIoT-IDE 使用文档](https://iot.mi.com/vela/quickapp/zh/guide/start/use-ide.html)、[大赛快应用教程](https://github.com/open-vela/docs/blob/dev-ai-contest-2026/zh-cn/contest_2026/quickapp/quickapp_guide_index.md)。
 
@@ -74,7 +76,7 @@ npm run build
 quickapp/bmt_smash/dist/com.waylean.bmtsmash.contest.debug.0.1.0.rpk
 ```
 
-构建启用 JSC，不启用 protobuf。RPK 和私人签名材料不随源码提交；调试产物不代表已取得官方商店发布资格。
+构建启用 JSC，不启用 protobuf。RPK 为本地调试产物，私人签名材料不随源码提交。
 
 如需通过赛事 manifest 拉取完整工作区，先安装官方要求的 `repo` 工具，再执行：
 
@@ -117,8 +119,8 @@ AI 协作覆盖需求拆解、方案设计、代码实现、调试、测试与�
 - [官方日志](logs/waylean/)：采集器会话与 manifest。
 - [隐私审计](docs/ai-log-privacy-audit.md)：混合商业项目会话排除与脱敏策略。
 - [可复用 Skill](skills/openvela-wearable-swing/SKILL.md)：独立运行边界、结构审计和验证流程。
-- 工具使用包括本地 CLI、浏览器、GitHub 及多智能体审查；MCP 使用以具体日志为准，不把所有 CLI 调用记作 MCP。
+- 工具链：本地 CLI 用于构建和回放；浏览器与 GitHub 工具用于文档核验和提交；多智能体工具用于独立审查。MCP 的具体调用以官方会话记录为准。
 
-**统计口径：** 未建立逐行 AI 代码归因，不以未经核实的百分比作为评审指标。历史材料的约 90% 是工作量估算，不是代码占比审计结果。`1,013,785` 是三份日志事件 Token 字段的历史直接求和，可能重复计算同一次响应，不能作为去重后的实际消耗或账单 Token；实际消耗待按官方采集器口径核验。
+**AI 使用统计：** AI 参与代码实现、测试和文档编写；逐行代码占比未单独统计。官方日志保留原始 Token 字段，但尚无经去重核验的总消耗，本作品不提供估算数值。
 
 本仓使用 Apache-2.0，不包含设备 AuthKey、私人签名密钥或真实用户健康数据。
